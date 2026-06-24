@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1">
+  <title>CMMS Master & Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <style>
+    body { background-color: #f4f7f6; font-family: 'Prompt', 'Segoe UI', Tahoma, sans-serif; color: #333; overflow-x: hidden; font-size: 16px; }
+    .navbar { background: linear-gradient(90deg, #1d2b64 0%, #0d6efd 100%); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .navbar-brand { font-weight: 700; letter-spacing: 0.5px; cursor: pointer; transition: 0.2s; }
+    .navbar-brand:hover { transform: scale(1.05); color: #ffc107 !important; }
+    
+    .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .form-label { font-weight: 600; color: #2c3e50; font-size: 0.95rem; margin-bottom: 0.4rem; }
+    
+    input.form-control, select.form-select, textarea.form-control { color: #000 !important; font-weight: 500 !important; border-radius: 8px; border: 1px solid #ced4da; padding: 0.5rem 0.75rem !important; font-size: 1rem !important; height: auto !important; }
+    input.form-control:focus, select.form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); }
+    select:disabled, input:disabled { background-color: #e9ecef !important; color: #adb5bd !important; border-color: #dee2e6 !important; cursor: not-allowed !important; opacity: 0.8; }
+    
+    .upload-box { border: 2px dashed #a5b1c2; padding: 15px; border-radius: 10px; text-align: center; background: #fff; cursor: pointer; transition: all 0.2s; color: #6c757d; }
+    .upload-box:hover { border-color: #0d6efd; background: #f0f4ff; color: #0d6efd; }
+    .preview-img { max-height: 110px; display: none; margin-top: 10px; border-radius: 8px; box-shadow: 0 3px 6px rgba(0,0,0,0.15); border: 2px solid #e9ecef; cursor: pointer; }
+    
+    .sub-system-card { border-left: 6px solid #1d2b64; margin-bottom: 30px; }
+    .part-group-card { border-left: 5px solid #0d6efd; background-color: #fdfdfe; margin-bottom: 20px; border-radius: 10px; }
+    .part-item { border-left: 4px solid #198754; background-color: #fff; position: relative; margin-bottom: 15px; border-radius: 8px; border: 1px solid #e9ecef; padding: 20px; transition: 0.2s; }
+    .btn-remove-part, .btn-remove-group { position: absolute; top: 12px; right: 12px; z-index: 10; border-radius: 50%; width: 35px; height: 35px; padding: 0; display: flex; align-items: center; justify-content: center;}
+    
+    #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; backdrop-filter: blur(4px); }
+    
+    .table-pm-container { max-height: 65vh; overflow: auto; border: 1px solid #dee2e6; border-radius: 10px; background:#fff; box-shadow: inset 0 0 5px rgba(0,0,0,0.02);}
+    .table-pm th, .table-pm td { white-space: nowrap; text-align: center; vertical-align: middle; border: 1px solid #e9ecef; font-size: 0.95rem; }
+    .table-pm thead th { position: sticky; top: 0; background: #1d2b64; color: white; z-index: 5; font-weight: 500; padding: 15px; }
+    .table-pm .sticky-col-1 { position: sticky; left: 0; background: #f8f9fa; z-index: 2; min-width: 230px; text-align: left; }
+    .table-pm .sticky-col-2 { position: sticky; left: 230px; background: #fff; z-index: 2; min-width: 320px; max-width: 320px; text-align: left; white-space: normal;}
+    .table-pm thead .sticky-col-1, .table-pm thead .sticky-col-2 { z-index: 6; background: #15204b; }
+    
+    .ticket-seat { display: inline-block; width: 38px; height: 38px; line-height: 38px; text-align: center; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid #ced4da; background-color: #f8f9fa; color: #adb5bd; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .ticket-seat:hover { transform: scale(1.15) translateY(-2px); box-shadow: 0 6px 12px rgba(13,110,253,0.3); border-color: #0d6efd; color: #0d6efd; }
+    .seat-pm { background-color: #198754 !important; color: white !important; border-color: #146c43 !important; }
+    .seat-bd { background-color: #dc3545 !important; color: white !important; border-color: #b02a37 !important; }
+    .seat-plan { background-color: #ffc107 !important; color: #000 !important; border-color: #d39e00 !important; }
+    
+    #loginSection { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: url('https://www.transparenttextures.com/patterns/cubes.png') #f4f7f6;}
+    .login-card { width: 100%; max-width: 420px; padding: 40px 30px; border-radius: 20px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 6px solid #0d6efd;}
+    .kpi-card { border-radius: 15px; padding: 25px; color: white; position: relative; overflow: hidden; }
+    .kpi-card .icon-bg { position: absolute; right: -10px; bottom: -20px; font-size: 6rem; opacity: 0.2; }
+    .kpi-title { font-size: 1.1rem; font-weight: 500; opacity: 0.9; }
+    .kpi-value { font-size: 2.5rem; font-weight: 700; }
+
+    .fab-wrapper { position: fixed; bottom: 35px; right: 35px; z-index: 1040; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; }
+    .fab-main { width: 65px; height: 65px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; background: linear-gradient(135deg, #1d2b64, #0d6efd); box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+    .fab-wrapper.active .fab-main { transform: rotate(90deg); background: linear-gradient(135deg, #dc3545, #ff4d4d); box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4); }
+    .fab-options { display: flex; flex-direction: column; align-items: flex-end; gap: 18px; opacity: 0; visibility: hidden; transform: translateY(30px) scale(0.9); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; }
+    .fab-wrapper.active .fab-options { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto; }
+    .fab-item-container { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .fab-label { background: #ffffff; padding: 8px 18px; border-radius: 20px; font-size: 0.95rem; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s; white-space: nowrap; user-select: none; }
+    
+    .fab-item { width: 52px; height: 52px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; color: white; }
+    .fab-btn-dashboard { background-color: #0d6efd; } 
+    .fab-btn-log { background-color: #0dcaf0; color: #000; }
+    .fab-btn-pm { background-color: #ffc107; color: #000; } 
+    .fab-btn-save { background-color: #198754; }
+
+    .fab-item-container:hover .fab-item { transform: scale(1.15); box-shadow: 0 6px 15px rgba(0,0,0,0.25); }
+    .fab-item-container:hover .fab-label { transform: scale(1.05) translateX(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+    
+    .hover-card { transition: all 0.2s ease; cursor: pointer; border-bottom: 5px solid transparent !important; }
+    .hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; border-bottom: 5px solid #0d6efd !important; }
+    .hover-card-success:hover { border-bottom: 5px solid #198754 !important; }
+    .hover-card-warning:hover { border-bottom: 5px solid #ffc107 !important; }
+
+    @media (max-width: 768px) {
+      body { font-size: 14px; }
+      .navbar-brand .fs-4 { font-size: 1.15rem !important; }
+      .user-name-text { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .main-machine-header { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
+      .kpi-card { padding: 15px 20px; border-radius: 12px; }
+      .kpi-value { font-size: 1.8rem; }
+      input.form-control, select.form-select { font-size: 0.9rem !important; padding: 0.4rem 0.6rem !important; }
+      .fab-wrapper { bottom: 15px; right: 15px; gap: 10px; }
+      .fab-main { width: 55px; height: 55px; font-size: 1.5rem; }
+      .fab-item { width: 45px; height: 45px; font-size: 1.1rem; }
+      .table-pm .sticky-col-1 { min-width: 90px !important; max-width: 90px; left: 0 !important; white-space: normal; word-break: break-word; font-size: 0.7rem; }
+      .table-pm .sticky-col-2 { min-width: 140px !important; max-width: 140px; left: 90px !important; white-space: normal; word-break: break-word; font-size: 0.7rem; }
+      .ticket-seat { width: 28px; height: 28px; line-height: 28px; font-size: 0.75rem; border-radius: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loadingOverlay">
+    <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 0.3rem;"></div>
+    <h5 class="mt-4 fw-bold text-primary" id="loadingText" style="letter-spacing: 1px;">กำลังประมวลผล...</h5>
+    <p class="text-muted small mt-2 fw-bold" id="loadingSubText" style="display:none;"></p>
+  </div>
+
+  <div class="modal fade" id="sysModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold" id="sysModalTitle"><i class="bi bi-info-circle"></i> แจ้งเตือน</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body fs-6 py-4" id="sysModalBody">...</div>
+        <div class="modal-footer border-0 bg-light">
+          <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal" id="sysModalCancel">ยกเลิก</button>
+          <button type="button" class="btn btn-primary fw-bold px-4" id="sysModalConfirm">ตกลง</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title fw-bold"><i class="bi bi-key-fill"></i> กู้คืนรหัสผ่าน (Forgot Password)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetForgotForm()"></button>
+        </div>
+        <div class="modal-body bg-light p-4">
+          <form id="forgotPasswordForm" onsubmit="event.preventDefault(); handleRequestOTP();">
+            <p class="small text-muted mb-4">กรุณากรอกรหัสพนักงานและอีเมลที่ใช้ลงทะเบียน ระบบจะส่งรหัส OTP สำหรับยืนยันตัวตนไปให้ทางอีเมลของท่าน</p>
+            <div class="mb-3">
+              <label class="form-label text-muted small">รหัสพนักงาน (Username)</label>
+              <input type="text" class="form-control" id="forgotUsername" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label text-muted small">อีเมล (Email)</label>
+              <input type="email" class="form-control" id="forgotEmail" placeholder="example@company.com" required>
+            </div>
+            <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm text-dark"><i class="bi bi-envelope-paper-fill"></i> ขอรับรหัส OTP</button>
+          </form>
+
+          <form id="resetPasswordForm" class="d-none" onsubmit="event.preventDefault(); handleVerifyAndReset();">
+            <div class="alert alert-success text-center py-2 mb-4 shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill"></i> รหัส OTP ถูกส่งไปยังอีเมลแล้ว (หมดอายุใน 5 นาที)
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">รหัส OTP (6 หลัก)</label>
+              <input type="text" class="form-control text-center fw-bold fs-5" id="resetOTP" maxlength="6" style="letter-spacing: 5px;" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">รหัสผ่านใหม่ (New Password)</label>
+              <input type="password" class="form-control" id="resetNewPass" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label text-muted small">ยืนยันรหัสผ่านใหม่ (Confirm Password)</label>
+              <input type="password" class="form-control" id="resetConfirmPass" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm"><i class="bi bi-shield-lock-fill"></i> ยืนยันและเปลี่ยนรหัสผ่าน</button>
+            <button type="button" class="btn btn-link w-100 text-decoration-none text-muted mt-2 small" onclick="resetForgotForm()"><i class="bi bi-arrow-left"></i> กลับไปหน้าขอ OTP ใหม่</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill"></i> ลงทะเบียนผู้ใช้งานใหม่</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light p-4">
+          <form id="registerForm" onsubmit="event.preventDefault(); handleRegister();">
+            <div class="mb-3">
+              <label class="form-label text-muted small">รหัสพนักงาน (Username)</label>
+              <input type="text" class="form-control" id="regUsername" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">รหัสผ่าน (Password)</label>
+              <input type="password" class="form-control" id="regPassword" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">ชื่อ - นามสกุล (Full Name)</label>
+              <input type="text" class="form-control" id="regFullName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">อีเมล (สำหรับรับแจ้งเตือนระบบ)</label>
+              <input type="email" class="form-control" id="regEmail" placeholder="example@company.com" required>
+            </div>
+            <div class="mb-4">
+              <label class="form-label text-muted small">ระดับสิทธิ์ (Role)</label>
+              <select class="form-select fw-bold text-secondary bg-light" id="regRole" disabled>
+                <option value="1" selected>1 - User (ผู้ใช้งานทั่วไป / ฝ่ายผลิต)</option>
+              </select>
+              <div class="form-text text-danger mt-1" style="font-size: 0.8rem;">
+                * สมัครครั้งแรกจะได้สิทธิ์ User ทั่วไป หากต้องการปรับสิทธิ์เป็นช่างซ่อมบำรุง/วิศวกร กรุณาแจ้งผู้ดูแลระบบให้ปรับสิทธิ์ครับ
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success w-100 fw-bold py-2 shadow-sm">ยืนยันการลงทะเบียน</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="userManageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header bg-dark text-white p-3">
+          <h5 class="modal-title fw-bold fs-5"><i class="bi bi-people-fill"></i> จัดการระดับสิทธิ์ผู้ใช้งาน</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light p-3 p-md-4">
+           <div class="table-responsive bg-white rounded shadow-sm border">
+              <table class="table table-hover align-middle text-center mb-0" style="font-size: 0.95rem;">
+                <thead class="table-primary">
+                  <tr>
+                     <th class="text-start">ข้อมูลผู้ใช้ (User)</th>
+                     <th>ระดับสิทธิ์ (Role)</th>
+                     <th>บันทึก (Action)</th>
+                  </tr>
+                </thead>
+                <tbody id="userManageTableBody"></tbody>
+              </table>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content border-0 shadow-lg border-top border-4 border-warning">
+        <div class="modal-body text-center p-4">
+          <i class="bi bi-question-circle text-warning" style="font-size: 3rem;"></i>
+          <h5 class="fw-bold mt-3 mb-2" id="confirmModalTitle">ยืนยัน</h5>
+          <p class="text-muted small mb-4" id="confirmModalBody">คุณต้องการดำเนินการต่อใช่หรือไม่?</p>
+          <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-light fw-bold w-50" data-bs-dismiss="modal">ยกเลิก</button>
+            <button type="button" class="btn btn-warning fw-bold text-dark w-50" id="confirmModalBtn">ตกลง</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header bg-dark text-white p-3">
+          <h6 class="modal-title fw-bold"><i class="bi bi-calendar-event"></i> บันทึกประวัติ W<span id="targetWeekSpan"></span></h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center p-4">
+          <p class="mb-4 fw-bold text-muted small">เลือกประเภทการซ่อมบำรุง:</p>
+          <button class="btn btn-success w-100 mb-3 fw-bold py-2 shadow-sm" onclick="triggerActionConfirm('PM')"><i class="bi bi-tools"></i> ทำตามแผน (PM)</button>
+          <button class="btn btn-danger w-100 mb-3 fw-bold py-2 shadow-sm" onclick="triggerActionConfirm('BD')"><i class="bi bi-exclamation-triangle"></i> เครื่องพัง (BD)</button>
+          <hr>
+          <button class="btn btn-outline-secondary w-100 fw-bold" onclick="triggerActionConfirm('')"><i class="bi bi-eraser"></i> ล้างข้อมูลช่องนี้</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="pmPlanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header bg-success text-white p-3">
+          <h5 class="modal-title fw-bold fs-5"><i class="bi bi-calendar3"></i> ตารางแผนบำรุงรักษา (PM Plan)</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light p-3 p-md-4">
+          <div class="card shadow-sm border-0 mb-4 p-3 p-md-4 bg-white pm-filter-container">
+            <div class="row g-3 align-items-end">
+              <div class="col-6 col-md-2">
+                <label class="form-label text-success">1. Plan</label>
+                <select class="form-select fw-bold bg-light border-success pm-plan-search" onchange="cascadePM('plan')"><option value="">- เลือก Plan -</option></select>
+              </div>
+              <div class="col-6 col-md-2">
+                <label class="form-label text-success">2. Type</label>
+                <select class="form-select fw-bold bg-light border-success pm-type-search" onchange="cascadePM('type')" disabled><option value="">- ล็อก -</option></select>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label text-success">3. Line (ไลน์ผลิต)</label>
+                <select class="form-select fw-bold bg-light border-success pm-line-search" onchange="cascadePM('line')" disabled><option value="">- ล็อก -</option></select>
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label text-success">4. Machine (เครื่องจักร)</label>
+                <select class="form-select fw-bold bg-light border-success pm-machine-search" disabled><option value="">- ล็อก -</option></select>
+              </div>
+              <div class="col-12 col-md-2">
+                <label class="form-label d-none d-md-block"> </label>
+                <button class="btn btn-primary w-100 fw-bold shadow-sm" onclick="handlePMFilterSubmit(this)"><i class="bi bi-search"></i> ดึงข้อมูล</button>
+              </div>
+            </div>
+            <div class="mt-4 text-muted small fw-bold text-center text-md-start">
+              <span class="badge bg-success me-1 fs-6 px-3">PM</span> <span class="ms-1 align-middle">= ซ่อมตามแผน</span> 
+              <span class="badge bg-danger ms-3 me-1 fs-6 px-3">BD</span> <span class="ms-1 align-middle">= เครื่องพัง</span> 
+              <span class="badge bg-warning text-dark ms-3 me-1 fs-6 px-3">P</span> <span class="ms-1 align-middle">= แผนถัดไป</span>
+            </div>
+          </div>
+          <div class="card shadow-sm border-0 p-2 p-md-3 bg-white">
+            <div id="pmTableWrapper">
+              <div class="p-5 text-center text-muted fw-bold fs-5"><i class="bi bi-inbox fs-1 d-block mb-3"></i>กรุณาเลือก ไลน์การผลิต ด้านบนเพื่อแสดงข้อมูล</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="historyLogModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header bg-info text-white p-3">
+          <h5 class="modal-title fw-bold fs-5"><i class="bi bi-clock-history"></i> ประวัติการใช้งานระบบ (History Log)</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light p-3 p-md-4">
+           <div class="table-responsive bg-white rounded shadow-sm border">
+              <table class="table table-hover table-striped mb-0 text-center" style="font-size: 0.9rem;">
+                <thead class="table-dark text-white">
+                  <tr>
+                     <th>เวลา (Timestamp)</th>
+                     <th>ผู้ใช้งาน (User)</th>
+                     <th>การกระทำ (Action)</th>
+                     <th>ไลน์ผลิต (Line)</th>
+                     <th>เครื่องจักร (Machine)</th>
+                     <th>รายละเอียด (Details)</th>
+                  </tr>
+                </thead>
+                <tbody id="historyLogTableBody"></tbody>
+              </table>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="upcomingPMDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content shadow-lg border-0">
+        <div class="modal-header bg-warning text-dark border-0">
+          <h5 class="modal-title fw-bold"><i class="bi bi-bell-fill"></i> รายการแผนซ่อมบำรุงที่ใกล้ถึงกำหนด (Upcoming PM)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 bg-light">
+          <div class="alert alert-warning text-dark fw-bold shadow-sm mb-4 border-warning border-2">
+             <i class="bi bi-building"></i> ไลน์ผลิต: <span id="upcomingLineName" class="fs-5 text-danger ms-1">--</span> 
+             <br><i class="bi bi-calendar-week mt-2 d-inline-block"></i> สัปดาห์ที่ครบกำหนด: <span class="badge bg-danger ms-1 fs-6">W<span id="upcomingWeekName">--</span></span>
+          </div>
+          <div class="table-responsive bg-white rounded shadow-sm border mb-4" style="max-height: 300px;">
+              <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.9rem;">
+                  <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
+                      <tr>
+                          <th class="text-start ps-3">เครื่องจักร (Machine)</th>
+                          <th class="text-start">ชิ้นส่วนที่ต้องดูแล (Part)</th>
+                          <th>สัปดาห์แผน (Plan)</th>
+                      </tr>
+                  </thead>
+                  <tbody id="upcomingPMTableBody">
+                      <tr><td colspan='3' class="py-4 text-muted">กำลังโหลดข้อมูล...</td></tr>
+                  </tbody>
+              </table>
+          </div>
+          
+          <hr class="my-4">
+          <div class="bg-white p-4 rounded shadow-sm border border-success border-opacity-25">
+              <h6 class="fw-bold text-success mb-3"><i class="bi bi-clipboard2-check-fill"></i> บันทึกการปฏิบัติงานหน้างาน (Execute PM)</h6>
+              <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                      <label class="form-label small text-muted fw-bold">วันที่เข้าปฏิบัติงาน (Date)</label>
+                      <input type="date" class="form-control fw-bold text-dark bg-light" id="executePMDate">
+                  </div>
+                  <div class="col-12 col-md-6">
+                      <label class="form-label small text-muted fw-bold">เวลา (Time)</label>
+                      <input type="time" class="form-control fw-bold text-dark bg-light" id="executePMTime">
+                  </div>
+              </div>
+              <button class="btn btn-success w-100 fw-bold mt-4 py-2 shadow-sm" onclick="alert('✅ ระบบบันทึกการทำ PM ลงฐานข้อมูลจะถูกเปิดใช้งานเต็มรูปแบบในเฟสถัดไปครับ\n(ข้อมูลวันที่: ' + document.getElementById('executePMDate').value + ' เวลา: ' + document.getElementById('executePMTime').value + ')')">
+                  <i class="bi bi-save"></i> ยืนยันการเข้าทำ PM ครบทุกรายการ
+              </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginSection">
+    <div class="login-card text-center">
+      <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow" style="width: 80px; height: 80px;">
+        <i class="bi bi-shield-lock-fill fs-1"></i>
+      </div>
+      <h3 class="fw-bold mb-4 text-dark">เข้าสู่ระบบ CMMS</h3>
+      <div id="loginAlert" class="alert alert-danger d-none fw-bold text-start small shadow-sm" role="alert"></div>
+      
+      <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+        <div class="mb-3 text-start">
+          <label class="form-label text-muted">รหัสพนักงาน (Username)</label>
+          <input type="text" class="form-control form-control-lg bg-light" id="usernameInput" placeholder="กรอกรหัสพนักงาน" onkeydown="if(event.key === 'Enter') document.getElementById('passwordInput').focus();" required>
+        </div>
+        <div class="mb-3 text-start">
+          <label class="form-label text-muted">รหัสผ่าน (Password)</label>
+          <input type="password" class="form-control form-control-lg bg-light" id="passwordInput" placeholder="กรอกรหัสผ่าน" onkeydown="if(event.key === 'Enter') handleLogin();" required>
+        </div>
+        <div class="mb-4 text-end">
+          <a href="#" class="text-decoration-none small fw-bold text-primary" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">ลืมรหัสผ่านใช่หรือไม่?</a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" id="btnLogin">เข้าสู่ระบบ</button>
+        <hr class="my-4">
+        <p class="text-muted small mb-2">ยังไม่มีบัญชีใช่หรือไม่?</p>
+        <button type="button" class="btn btn-outline-secondary w-100 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#registerModal">ลงทะเบียนผู้ใช้งานใหม่</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="mainAppSection" style="display: none;">
+    <div class="fab-wrapper" id="floatingMenu" style="display: none;">
+      <div class="fab-options" id="fabOptions">
+        <div class="fab-item-container d-none" id="btnDashboard" onclick="switchView('dashboard'); toggleFab();">
+          <span class="fab-label lbl-dashboard">หน้าหลัก (Dashboard)</span>
+          <button class="fab-item fab-btn-dashboard" title="กลับไปหน้าแดชบอร์ด"><i class="bi bi-bar-chart-fill"></i></button>
+        </div>
+        
+        <div class="fab-item-container d-none" id="btnManageUsers" onclick="loadUsersForManager(); toggleFab();">
+          <span class="fab-label text-dark">จัดการผู้ใช้งาน (Users)</span>
+          <button class="fab-item bg-dark text-white" title="จัดการระดับสิทธิ์"><i class="bi bi-people-fill"></i></button>
+        </div>
+
+        <div class="fab-item-container d-none" id="btnHistoryLog" onclick="loadHistoryLogs(); toggleFab();">
+          <span class="fab-label lbl-log">ประวัติระบบ (Log)</span>
+          <button class="fab-item fab-btn-log" title="ดูประวัติการใช้งาน"><i class="bi bi-clock-history"></i></button>
+        </div>
+        <div class="fab-item-container" id="btnFloatingPM" data-bs-toggle="modal" data-bs-target="#pmPlanModal" onclick="toggleFab();">
+          <span class="fab-label lbl-pm">ตาราง PM (Schedule)</span>
+          <button class="fab-item fab-btn-pm" title="เปิดตารางซ่อมบำรุง"><i class="bi bi-calendar-check-fill"></i></button>
+        </div>
+        <div class="fab-item-container" id="btnFloatingSave" onclick="document.getElementById('btnSubmit').click(); toggleFab();">
+          <span class="fab-label lbl-save">บันทึกข้อมูล (Save)</span>
+          <button class="fab-item fab-btn-save" title="บันทึกข้อมูลเครื่องจักร"><i class="bi bi-cloud-arrow-up-fill"></i></button>
+        </div>
+      </div>
+      <button class="fab-main" onclick="toggleFab()" title="เมนูคำสั่ง (Menu)">
+        <i class="bi bi-grid-fill" id="fabIcon" style="transition: all 0.3s;"></i>
+      </button>
+    </div>
+
+    <nav class="navbar navbar-expand navbar-dark sticky-top p-2 p-md-3">
+      <div class="container d-flex flex-nowrap align-items-center justify-content-between">
+        <a class="navbar-brand d-flex align-items-center m-0" onclick="resetToHome()" title="คลิกเพื่อล้างฟอร์มและเริ่มใหม่">
+          <i class="bi bi-cpu-fill me-2 fs-2 text-warning" id="navIcon"></i>
+          <div>
+            <div class="fs-4 fw-bold mb-0 lh-1 nav-title">CMMS Master</div>
+            <div class="fw-normal text-light opacity-75 mt-1 d-none d-md-block" style="font-size: 0.8rem;">คลิกเพื่อล้างฟอร์มสร้างใหม่</div>
+          </div>
+        </a>
+        <div class="d-flex align-items-center bg-white bg-opacity-10 py-1 px-2 py-md-2 px-md-4 rounded-pill border border-light border-opacity-25 user-pill">
+          <span class="text-white me-2 fw-bold d-flex align-items-center" style="font-size: 0.9rem;">
+            <i class="bi bi-person-circle text-warning fs-6 align-middle me-1"></i> 
+            <span id="displayUserName" class="user-name-text">User</span>
+          </span>
+          <button class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; border-width: 2px;" onclick="logout()" title="ออกจากระบบ">
+            <i class="bi bi-power" style="font-size: 0.9rem; font-weight: bold;"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4 mb-5 pb-5" style="max-width: 1100px;">
+      
+      <div id="dashboardView" style="display: none;">
+         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+             <div class="d-flex align-items-center flex-wrap gap-3">
+                 <div>
+                     <h2 class="fw-bold text-dark mb-1">Executive Dashboard</h2>
+                     <p class="text-muted mb-0">ภาพรวมระบบบริหารจัดการเครื่องจักร</p>
+                 </div>
+                 <div class="ms-md-3 border-start border-4 border-info ps-3 py-1">
+                     <div class="text-muted small fw-bold"><i class="bi bi-calendar-event"></i> สัปดาห์ปัจจุบันของปี</div>
+                     <h4 class="fw-bold text-info mb-0" style="letter-spacing: 1px;">Week <span id="currentWeekBadge">--</span></h4>
+                 </div>
+             </div>
+             <div>
+                 <a href="https://engpcl2530-uni.github.io/BPC-Background-system-Unilever/" class="btn btn-dark fw-bold rounded-pill shadow-sm px-4 py-2">
+                    <i class="bi bi-house-door-fill me-1"></i> กลับหน้า Hub ระบบ
+                 </a>
+             </div>
+         </div>
+         
+         <div class="row g-4 mb-4">
+             <div class="col-12 col-md-4">
+                 <div class="kpi-card bg-primary shadow">
+                     <i class="bi bi-hdd-rack icon-bg"></i>
+                     <div class="kpi-title">เครื่องจักรในระบบ (Machines)</div>
+                     <div class="kpi-value mt-2" id="kpiMachines">--</div>
+                 </div>
+             </div>
+             <div class="col-12 col-md-4">
+                 <div class="kpi-card bg-success shadow">
+                     <i class="bi bi-tools icon-bg"></i>
+                     <div class="kpi-title">ชิ้นส่วนอะไหล่ (Spare Parts)</div>
+                     <div class="kpi-value mt-2" id="kpiParts">--</div>
+                  </div>
+             </div>
+             <div class="col-12 col-md-4">
+                 <div class="kpi-card bg-warning text-dark shadow">
+                     <i class="bi bi-building icon-bg text-dark"></i>
+                     <div class="kpi-title">ไลน์การผลิตทั้งหมด (Lines)</div>
+                     <div class="kpi-value mt-2" id="kpiLines">--</div>
+                 </div>
+             </div>
+         </div>
+
+         <div class="row g-4">
+            <div class="col-12 col-md-4">
+                 <div class="card shadow-sm border-0 h-100 hover-card" onclick="switchView('setup')">
+                    <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
+                        <i class="bi bi-gear-wide-connected text-primary mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="fw-bold mb-2">CMMS Setup</h5>
+                        <p class="text-muted small mb-0">เพิ่ม ลบ แก้ไขโครงสร้างเครื่องจักร</p>
+                    </div>
+                </div>
+             </div>
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm border-0 h-100 hover-card hover-card-success" data-bs-toggle="modal" data-bs-target="#pmPlanModal">
+                    <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
+                        <i class="bi bi-calendar-check text-success mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="fw-bold mb-2">ตารางแผนซ่อมบำรุง</h5>
+                        <p class="text-muted small mb-0">ตรวจสอบ PM/BD แผนรายสัปดาห์</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm border-0 h-100 hover-card hover-card-warning border-bottom border-warning border-4" onclick="openUpcomingModal()" style="background: linear-gradient(180deg, #fff 0%, #fffdf0 100%);">
+                    <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
+                        <i class="bi bi-exclamation-triangle-fill text-warning mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="fw-bold mb-2">PM ใกล้ถึงกำหนด</h5>
+                        <div id="upcomingPMText" class="text-muted small">กำลังดึงข้อมูล...</div>
+                    </div>
+                </div>
+            </div>
+         </div>
+      </div>
+
+      <div id="setupView" style="display: none;">
+        <form id="masterForm" onsubmit="event.preventDefault(); handleFormSubmit();">
+          <input type="hidden" id="setupUserInput">
+          <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-dark text-white main-machine-header d-flex justify-content-between align-items-center" style="border-radius: 12px 12px 0 0;">
+              <h5 class="mb-0 fw-bold"><i class="bi bi-hdd-rack"></i> 1. ข้อมูลเครื่องจักรหลัก</h5>
+              <button type="button" class="btn btn-primary shadow-sm rounded-pill fw-bold px-4" onclick="triggerImportCMMS()">
+                  <i class="bi bi-cloud-arrow-up-fill fs-5 me-2 align-middle"></i> นำเข้าข้อมูล (Upload)
+              </button>
+              <input type="file" id="importFileInput" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" class="d-none" onchange="handleImportFile(this)">
+            </div>
+            <div class="card-body bg-white">
+               <div class="row g-3">
+                  <div class="col-12 col-md-9">
+                  <div class="row g-3 align-items-end">
+                    <div class="col-6">
+                      <label class="form-label">1. Plan (แผนก)</label>
+                      <select class="form-select fw-bold border-primary text-primary" id="machinePlan" onchange="cascadeSetup('plan')" required>
+                        <option value="">- เลือก -</option><option value="PCL">PCL</option><option value="CO">CO</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label">2. ประเภท (Type)</label>
+                      <select class="form-select fw-bold border-primary text-primary" id="machineType" onchange="cascadeSetup('type')" disabled required>
+                        <option value="">- ล็อก -</option><option value="Packing">Packing</option><option value="Mixing">Mixing</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label">3. ไลน์ผลิต (Line / Area)</label>
+                      <div class="input-group shadow-sm rounded">
+                        <select class="form-select fw-bold border-primary text-primary" id="lineNameSelect" onchange="cascadeSetup('line')" disabled required>
+                          <option value="">- ล็อก -</option>
+                        </select>
+                        <input type="text" class="form-control d-none border-primary" id="lineNameInput" placeholder="พิมพ์ชื่อไลน์ผลิตใหม่...">
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label">4. ชื่อเครื่องจักร (Machine)</label>
+                      <div class="input-group shadow-sm rounded">
+                        <select class="form-select fw-bold border-primary text-primary" id="machineNameSelect" onchange="cascadeSetup('machine')" disabled required>
+                          <option value="">- ล็อก -</option>
+                        </select>
+                        <input type="text" class="form-control d-none border-primary" id="machineNameInput" placeholder="พิมพ์ชื่อเครื่องใหม่...">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-3 d-flex flex-column mt-3 mt-md-0">
+                  <label class="form-label text-center text-md-start w-100">ภาพเครื่องจักร</label>
+                  <div class="upload-box p-3 shadow-sm flex-grow-1 d-flex flex-column justify-content-center align-items-center" onclick="this.nextElementSibling.click()" style="min-height: 120px;">
+                     <i class="bi bi-camera-fill fs-1 d-block mb-2 text-muted"></i><span class="fw-bold text-secondary">เพิ่มรูปภาพ</span>
+                  </div>
+                  <input type="file" id="imgMachine" accept="image/*" capture="environment" class="d-none" onchange="previewDynamicFile(this)">
+                  <img class="preview-img img-fluid mx-auto mt-2 shadow-sm rounded" style="display:none; max-height: 140px; width: 100%; object-fit: cover;" onclick="this.previousElementSibling.click()" title="คลิกเพื่อเปลี่ยนรูป">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center mb-3 mt-4">
+            <h5 class="fw-bold text-primary mb-0"><i class="bi bi-diagram-3-fill"></i> 2. โครงสร้างระบบ (Structure)</h5>
+          </div>
+          <div id="subSystemsContainer"></div>
+          <button type="button" class="btn btn-outline-dark w-100 fw-bold mb-4 py-3 shadow-sm border-2 rounded-3" onclick="addSubsystemCard()">
+             <i class="bi bi-plus-circle-dotted fs-5 align-middle me-2"></i> เพิ่มระบบย่อยใหม่ (Sub-system)
+          </button>
+          <button type="submit" class="d-none" id="btnSubmit">บันทึกข้อมูลซ่อน</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <datalist id="partDataList"></datalist>
+
+  <template id="subSystemTemplate">
+    <div class="sub-system-card card shadow-sm">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2 px-3">
+         <h6 class="mb-0 fw-bold"><i class="bi bi-diagram-2-fill"></i> ระบบย่อย <span class="badge bg-light text-dark ms-2 sub-idx">1</span></h6>
+        <button type="button" class="btn btn-outline-light btn-sm fw-bold btn-remove-sub" onclick="removeSubsystem(this)"><i class="bi bi-trash-fill"></i> ลบ</button>
+      </div>
+      <div class="card-body bg-white border-bottom border-2">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-8">
+            <label class="form-label text-dark">ชื่อระบบย่อย</label>
+            <input type="text" class="form-control border-dark bg-light input-subname" required>
+          </div>
+          <div class="col-12 col-md-4 text-center mt-2 mt-md-0">
+            <div class="upload-box p-2 text-dark border-dark shadow-sm bg-light" onclick="this.nextElementSibling.click()" style="min-height: 80px;">
+              <i class="bi bi-images fs-3 d-block mb-1"></i> ภาพระบบย่อย
+            </div>
+            <input type="file" class="d-none file-sub-img" accept="image/*" capture="environment" onchange="previewDynamicFile(this)">
+            <img class="preview-img sub-system-img-preview img-fluid mx-auto mt-2" style="display:none;" onclick="this.previousElementSibling.click()">
+          </div>
+        </div>
+      </div>
+      <div class="card-body bg-light p-2 p-md-4 groups-container"></div>
+      <div class="card-footer bg-white text-center py-3 border-0">
+         <button type="button" class="btn btn-outline-primary fw-bold rounded-pill px-4 shadow-sm" onclick="addPartGroupCard(this)"><i class="bi bi-plus-square-fill"></i> เพิ่มกลุ่มอะไหล่</button>
+       </div>
+    </div>
+  </template>
+
+  <template id="partGroupTemplate">
+    <div class="part-group-card card shadow-sm position-relative">
+      <button type="button" class="btn btn-danger shadow-sm btn-remove-group" title="ลบกลุ่มนี้" onclick="removePartGroup(this)"><i class="bi bi-x-lg"></i></button>
+      <div class="card-header bg-primary text-white py-2 px-3 rounded-top">
+        <h6 class="mb-0 fw-bold"><i class="bi bi-box-seam-fill"></i> กลุ่มอะไหล่</h6>
+      </div>
+      <div class="card-body bg-white border-bottom border-primary border-2">
+          <div class="row g-3 align-items-end">
+           <div class="col-12 col-md-8">
+             <label class="form-label text-primary">ชื่อกลุ่มอะไหล่</label>
+             <input type="text" class="form-control border-primary bg-primary bg-opacity-10 input-groupname" required>
+          </div>
+          <div class="col-12 col-md-4 text-center mt-2 mt-md-0">
+            <div class="upload-box p-2 border-primary text-primary bg-white shadow-sm" onclick="this.nextElementSibling.click()" style="min-height: 80px;">
+              <i class="bi bi-image fs-3 d-block"></i> ภาพกลุ่ม
+             </div>
+            <input type="file" class="d-none file-group-img" accept="image/*" capture="environment" onchange="previewDynamicFile(this)">
+            <img class="preview-img sub-system-img-preview img-fluid mx-auto mt-2" style="display:none;" onclick="this.previousElementSibling.click()">
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-2 p-md-4 parts-container" style="background-color: #f0f4ff;"><h6 class="fw-bold text-primary mb-3 mt-2"><i class="bi bi-tools"></i> ชิ้นส่วนอะไหล่ในกลุ่มนี้:</h6></div>
+      <div class="card-footer bg-white text-center text-md-end py-3"><button type="button" class="btn btn-success fw-bold shadow-sm rounded-pill px-4" onclick="addPartToGroup(this)"><i class="bi bi-plus-circle-fill"></i> เพิ่มชิ้นส่วน (Part)</button></div>
+    </div>
+  </template>
+
+  <template id="partTemplate">
+    <div class="part-item border rounded shadow-sm bg-white">
+      <button type="button" class="btn btn-outline-danger bg-white shadow-sm btn-remove-part" title="ลบชิ้นส่วนนี้" onclick="removePart(this)"><i class="bi bi-trash-fill"></i></button>
+       <div class="row g-3">
+        <div class="col-12 col-md-3 text-center">
+          <div class="upload-box p-3 shadow-sm bg-light" onclick="this.nextElementSibling.click()" style="height:100%; min-height: 100px;"><i class="bi bi-camera fs-2 d-block text-muted mb-1"></i> ภาพอะไหล่</div>
+          <input type="file" class="d-none file-exp-img" accept="image/*" capture="environment" onchange="previewDynamicFile(this)">
+          <img class="preview-img img-fluid mx-auto mt-2" style="display:none;" onclick="this.previousElementSibling.click()">
+        </div>
+        <div class="col-12 col-md-9">
+          <div class="row g-2">
+            <div class="col-12 col-md-5"><label class="form-label text-success">ชื่อชิ้นส่วน / Model</label><input type="text" class="form-control border-success input-partname" list="partDataList" onchange="autoFillPartInfo(this)" required></div>
+            <div class="col-6 col-md-3"><label class="form-label text-success">รหัสชั้นวาง (ID)</label><input type="text" class="form-control border-success input-partid" placeholder="e.g. A-01" list="partDataList" onchange="autoFillPartInfo(this)"></div>
+            <div class="col-6 col-md-4"><label class="form-label">Part Number</label><input type="text" class="form-control input-partnum bg-light" list="partDataList" onchange="autoFillPartInfo(this)"></div>
+            <div class="col-12 col-md-4"><label class="form-label">สเปค (Detail)</label><input type="text" class="form-control input-dim bg-light"></div>
+            <div class="col-4 col-md-3"><label class="form-label text-danger">ความถี่ PM</label><input type="text" class="form-control border-danger bg-danger bg-opacity-10 input-pm" placeholder="e.g. 12W"></div>
+            <div class="col-4 col-md-3"><label class="form-label">Standard</label><select class="form-select input-pmstandard bg-light"><option value="TBM">TBM</option><option value="CBM">CBM</option><option value="BDM">BDM</option></select></div>
+            <div class="col-4 col-md-2"><label class="form-label">Class</label><select class="form-select input-class bg-light"><option value="C">C</option><option value="B">B</option><option value="A">A</option></select></div>
+            <div class="col-6 col-md-4"><label class="form-label">PM ล่าสุด</label><input type="date" class="form-control input-lastpm bg-light"></div>
+            <div class="col-6 col-md-4"><label class="form-label">Cond.</label><select class="form-select select-condition bg-light"><option value="STOP">STOP</option><option value="RUN">RUN</option></select></div>
+            <div class="col-12 col-md-4"><label class="form-label">เวลา(นาที)</label><input type="number" class="form-control input-duration bg-light" min="0"></div>
+             <div class="col-12"><label class="form-label">วิธีการดูแล (Method)</label><input type="text" class="form-control input-method bg-light"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // 🔗 กำหนด URL ของ Google Apps Script Web App ของคุณ
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzlNI_mRXj1-2yuwiOWY71iIR_nfcO_P1zcAlqcVZpahkT3loe8SMp07v1IgFrUCYIFcg/exec";
+
+    // 🚀 ฟังก์ชันหลักสำหรับยิง API ไปหา Backend แทน google.script.run
+    function apiCall(action, params = {}) {
+        return fetch(GAS_API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: action, ...params }),
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+        }).then(res => res.json());
+    }
+
+    var globalPartsData = [];
+    var globalMachinesData = []; 
+    var currentMachinePM = ""; 
+    var targetActionCell = null; 
+    var targetActionWeek = 0; 
+    var pendingActionType = "";
+    var pmShowAllWeeks = false; 
+    var currentUserRole = ""; 
+    window.upcomingPMData = null;
+
+    document.addEventListener('show.bs.modal', function (event) {
+        var zIndex = 1050 + (10 * document.querySelectorAll('.modal.show').length);
+        event.target.style.zIndex = zIndex;
+        setTimeout(function() {
+            var backdrops = document.querySelectorAll('.modal-backdrop');
+            if(backdrops.length > 0) backdrops[backdrops.length - 1].style.zIndex = zIndex - 1;
+        }, 10);
+    });
+
+    // =========================================================================
+    // 🛠️ Utilities Functions
+    // =========================================================================
+    function formatDateToEuro(dateString) {
+      if(!dateString) return "";
+      var d = new Date(dateString); if(isNaN(d)) return dateString;
+      var day = String(d.getDate()).padStart(2, '0'); var month = String(d.getMonth() + 1).padStart(2, '0');
+      var year = d.getFullYear(); return day + "/" + month + "/" + year;
+    }
+    
+    function parseEuroToDateInput(dateVal) {
+      if(!dateVal) return "";
+      var d = new Date(dateVal);
+      if(!isNaN(d) && dateVal.toString().includes("GMT")) return d.toISOString().split('T')[0];
+      if(typeof dateVal === 'string' && dateVal.includes('/')) { var parts = dateVal.split('/');
+      if(parts.length === 3) return parts[2] + "-" + parts[1] + "-" + parts[0]; } return dateVal;
+    }
+    
+    function extractWeeks(freqStr) {
+      var match = freqStr.match(/(\d+)\s*(W|M)/i);
+      if(!match) return 0;
+      var num = parseInt(match[1]); return match[2].toUpperCase() === 'M' ? num * 4 : num;
+    }
+    
+    function getWeekNumber(d) {
+      if(!d) return 0;
+      var date = new Date(d);
+      if(isNaN(date.getTime())) return 0;
+      var firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+      var pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+      return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    }
+    
+    function showLoading(text, subText = "") { 
+        document.getElementById('loadingText').innerText = text;
+        if(subText) { 
+            document.getElementById('loadingSubText').innerText = subText; 
+            document.getElementById('loadingSubText').style.display = 'block';
+        } else { 
+            document.getElementById('loadingSubText').style.display = 'none';
+        }
+        document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+    
+    function hideLoading() { 
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+    
+    function openAlert(title, msg) {
+      document.getElementById('sysModalTitle').innerText = title;
+      document.getElementById('sysModalBody').innerHTML = msg;
+      document.getElementById('sysModalCancel').style.display = 'none';
+      document.getElementById('sysModalConfirm').onclick = function() { bootstrap.Modal.getInstance(document.getElementById('sysModal')).hide(); }; new bootstrap.Modal(document.getElementById('sysModal')).show();
+    }
+    
+    function openConfirm(title, msg, callback) {
+      document.getElementById('sysModalTitle').innerText = title;
+      document.getElementById('sysModalBody').innerHTML = msg;
+      document.getElementById('sysModalCancel').style.display = 'inline-block';
+      document.getElementById('sysModalConfirm').onclick = function() { bootstrap.Modal.getInstance(document.getElementById('sysModal')).hide(); if(callback) callback(); }; new bootstrap.Modal(document.getElementById('sysModal')).show();
+    }
+    
+    function toggleFab() {
+        var fab = document.getElementById('floatingMenu');
+        fab.classList.toggle('active');
+        var icon = document.getElementById('fabIcon');
+        if (fab.classList.contains('active')) { 
+            icon.classList.remove('bi-grid-fill');
+            icon.classList.add('bi-x-lg'); icon.style.transform = "rotate(-90deg)"; 
+        } else { 
+            icon.classList.remove('bi-x-lg');
+            icon.classList.add('bi-grid-fill'); icon.style.transform = "rotate(0deg)";
+        }
+    }
+    
+    document.addEventListener('click', function(event) {
+        var fab = document.getElementById('floatingMenu'); if (fab && fab.classList.contains('active') && !fab.contains(event.target)) { toggleFab(); }
+    });
+
+    // =========================================================================
+    // 🔐 ระบบจัดการบัญชี (Auth & Users)
+    // =========================================================================
+    
+    function handleRegister() {
+      var rUser = document.getElementById('regUsername').value;
+      var rPass = document.getElementById('regPassword').value;
+      var rName = document.getElementById('regFullName').value; var rEmail = document.getElementById('regEmail').value;
+      if(!rUser || !rPass || !rName || !rEmail) { openAlert("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบถ้วน"); return; }
+      
+      var payload = { username: rUser, password: rPass, fullName: rName, email: rEmail };
+      showLoading("กำลังสร้างบัญชีผู้ใช้ใหม่...", "ระบบจะส่งอีเมลยืนยันการลงทะเบียนไปยังอีเมลของคุณ");
+      
+      apiCall('registerNewUser', { payload: payload })
+        .then(function(res) {
+          hideLoading();
+          if(res.success) {
+            bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide(); document.getElementById('registerForm').reset();
+            openAlert("สำเร็จ", "<i class='bi bi-check-circle-fill text-success fs-1 d-block mb-3 text-center'></i><div class='text-center'>" + res.message + "</div>");
+          } else { openAlert("เกิดข้อผิดพลาด", res.message); }
+        })
+        .catch(function(err) { hideLoading(); openAlert("System Error", err.message); });
+    }
+
+    function handleLogin() {
+      var user = document.getElementById('usernameInput').value;
+      var pass = document.getElementById('passwordInput').value; var alertBox = document.getElementById('loginAlert');
+      
+      if(!user || !pass) { alertBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> กรุณากรอกรหัสพนักงานและรหัสผ่าน'; alertBox.classList.remove('d-none'); return; }
+      
+      showLoading('กำลังตรวจสอบข้อมูลการเข้าระบบ...'); alertBox.classList.add('d-none');
+      
+      apiCall('verifyLogin', { username: user, password: pass })
+        .then(function(res) {
+            hideLoading();
+            if(res && res.success) {
+              var role = String(res.role).trim(); currentUserRole = role; 
+              var sessionData = { fullName: res.fullName, role: role, token: res.token, timestamp: new Date().getTime() };
+              localStorage.setItem('cmms_user_session', JSON.stringify(sessionData));
+              
+              document.getElementById('loginSection').style.display = 'none'; document.getElementById('mainAppSection').style.display = 'block';
+              document.getElementById('displayUserName').innerText = res.fullName; 
+              document.getElementById('setupUserInput').value = res.fullName;
+              document.getElementById('floatingMenu').style.display = 'flex'; 
+              
+              if(role === '3' || role === '4') {
+                  document.getElementById('btnHistoryLog').classList.remove('d-none');
+                  document.getElementById('btnManageUsers').classList.remove('d-none');
+                  switchView('dashboard');
+              } else {
+                  document.getElementById('btnHistoryLog').classList.add('d-none');
+                  document.getElementById('btnManageUsers').classList.add('d-none');
+                  switchView('setup');
+              }
+              if (typeof loadInitialData === "function") loadInitialData();
+            } else { 
+                alertBox.innerHTML = '<i class="bi bi-x-circle-fill"></i> ' + (res ? res.message : "การเชื่อมต่อฐานข้อมูลล้มเหลว");
+                alertBox.classList.remove('d-none');
+            }
+        })
+        .catch(function(err) { 
+            hideLoading(); 
+            alertBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> เกิดข้อผิดพลาดของระบบ (Error)'; alertBox.classList.remove('d-none'); 
+            openAlert("System Error", err.message); 
+        });
+    }
+
+    function handleRequestOTP() {
+      var fUser = document.getElementById('forgotUsername').value;
+      var fEmail = document.getElementById('forgotEmail').value;
+      if(!fUser || !fEmail) { openAlert("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบถ้วน"); return; }
+
+      showLoading("กำลังตรวจสอบข้อมูล...", "ระบบกำลังสร้างและจัดส่งรหัส OTP (อาจใช้เวลาสักครู่)");
+      
+      apiCall('requestOTP', { username: fUser, email: fEmail })
+        .then(function(res) {
+          hideLoading();
+          if(res.success) {
+            document.getElementById('forgotPasswordForm').classList.add('d-none');
+            document.getElementById('resetPasswordForm').classList.remove('d-none');
+            document.getElementById('resetOTP').focus();
+          } else { openAlert("เกิดข้อผิดพลาด", res.message); }
+        })
+        .catch(function(err) { hideLoading(); openAlert("System Error", err.message); });
+    }
+
+    function handleVerifyAndReset() {
+      var username = document.getElementById('forgotUsername').value;
+      var otp = document.getElementById('resetOTP').value;
+      var newPass = document.getElementById('resetNewPass').value;
+      var confirmPass = document.getElementById('resetConfirmPass').value;
+      
+      if(!otp || !newPass || !confirmPass) { openAlert("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบถ้วน"); return; }
+      if(newPass !== confirmPass) { openAlert("แจ้งเตือน", "รหัสผ่านใหม่และการยืนยันรหัสผ่านไม่ตรงกัน"); return; }
+
+      showLoading("กำลังยืนยัน OTP...", "ระบบกำลังดำเนินการเปลี่ยนรหัสผ่านของคุณ");
+      
+      apiCall('verifyOTPAndReset', { username: username, otp: otp, newPassword: newPass })
+        .then(function(res) {
+          hideLoading();
+          if(res.success) {
+            bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
+            resetForgotForm();
+            openAlert("สำเร็จ", "<i class='bi bi-shield-check text-success fs-1 d-block mb-3 text-center'></i><div class='text-center'>" + res.message + "</div>");
+          } else { openAlert("เกิดข้อผิดพลาด", res.message); }
+        })
+        .catch(function(err) { hideLoading(); openAlert("System Error", err.message); });
+    }
+
+    function resetForgotForm() {
+        document.getElementById('forgotPasswordForm').reset();
+        document.getElementById('resetPasswordForm').reset();
+        document.getElementById('resetPasswordForm').classList.add('d-none');
+        document.getElementById('forgotPasswordForm').classList.remove('d-none');
+    }
+
+    function loadUsersForManager() {
+        showLoading("กำลังโหลดรายชื่อผู้ใช้งาน...");
+        apiCall('getAllUsers')
+        .then(function(res) {
+            hideLoading();
+            if(!res.success) { openAlert("Error", res.message); return; }
+            var tbody = document.getElementById('userManageTableBody');
+            tbody.innerHTML = "";
+            res.data.forEach(function(u) {
+                var isTargetManager = (u.role === '4');
+                var isCurrentUserAdmin = (currentUserRole === '3');
+                var disableAttr = (isCurrentUserAdmin && isTargetManager) ? "disabled" : "";
+                
+                var roleSelect = `
+                    <select class="form-select form-select-sm fw-bold ${u.role==='4'?'text-danger':(u.role==='3'?'text-primary':'text-success')}" id="roleSelect_${u.username}" ${disableAttr}>
+                        <option value="1" ${u.role === '1' ? 'selected' : ''}>1 - User (ผู้ใช้งานทั่วไป)</option>
+                        <option value="2" ${u.role === '2' ? 'selected' : ''}>2 - Staff (ช่างซ่อมบำรุง)</option>
+                        <option value="3" ${u.role === '3' ? 'selected' : ''}>3 - Admin (แอดมิน)</option>
+                        <option value="4" ${u.role === '4' ? 'selected' : ''}>4 - Manager (ผู้จัดการ)</option>
+                    </select>
+                `;
+                tbody.innerHTML += `<tr>
+                    <td class="text-start align-middle">
+                        <div class="fw-bold text-dark">${u.fullName}</div>
+                        <div class="text-muted" style="font-size:0.8rem;">ID: ${u.username} <br>อีเมล: ${u.email}</div>
+                    </td>
+                    <td class="align-middle">${roleSelect}</td>
+                    <td class="align-middle">
+                        <button class="btn btn-sm btn-outline-primary fw-bold px-3" onclick="updateUserRole('${u.username}')" ${disableAttr}>บันทึก</button>
+                    </td>
+                </tr>`;
+            });
+            new bootstrap.Modal(document.getElementById('userManageModal')).show();
+        })
+        .catch(function(e) { hideLoading(); openAlert("Error", e.message); });
+    }
+
+    function updateUserRole(username) {
+        var sessionStr = localStorage.getItem('cmms_user_session');
+        if (!sessionStr) return;
+        var sessionToken = JSON.parse(sessionStr).token;
+        var newRole = document.getElementById('roleSelect_' + username).value;
+        
+        showLoading("กำลังอัปเดตสิทธิ์...");
+        apiCall('changeUserRole', { targetUsername: username, newRole: newRole, token: sessionToken })
+        .then(function(res) {
+            hideLoading();
+            if(res.success) { alert("✅ ปรับระดับสิทธิ์เรียบร้อยแล้ว"); loadUsersForManager(); } 
+            else { openAlert("Error", res.message); }
+        })
+        .catch(function(e) { hideLoading(); openAlert("Error", e.message); });
+    }
+
+    // =========================================================================
+    // 📊 ระบบการแสดงผลและจัดการหน้าจอ (Navigation & Setup UI)
+    // =========================================================================
+
+    function switchView(viewName) {
+        if(viewName === 'dashboard') {
+            document.getElementById('dashboardView').style.display = 'block';
+            document.getElementById('setupView').style.display = 'none';
+            document.getElementById('btnFloatingSave').classList.add('d-none'); document.getElementById('btnDashboard').classList.add('d-none'); 
+        } else {
+            document.getElementById('dashboardView').style.display = 'none';
+            document.getElementById('setupView').style.display = 'block';
+            document.getElementById('btnFloatingSave').classList.remove('d-none'); 
+            if(currentUserRole === '3' || currentUserRole === '4') { document.getElementById('btnDashboard').classList.remove('d-none'); }
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateDashboardKPIs() {
+        if(globalMachinesData && globalMachinesData.length > 0) {
+            document.getElementById('kpiMachines').innerText = globalMachinesData.length;
+            var uniqueLines = [...new Set(globalMachinesData.map(m => m.lineName))].filter(Boolean); document.getElementById('kpiLines').innerText = uniqueLines.length;
+        }
+        if(globalPartsData && globalPartsData.length > 0) { document.getElementById('kpiParts').innerText = globalPartsData.length; }
+    }
+    
+    function fetchUpcomingDashboardData() {
+        var currentWeekUi = document.getElementById('currentWeekBadge');
+        var cw = getWeekNumber(new Date());
+        currentWeekUi.innerText = cw; 
+        
+        apiCall('getDashboardUpcomingPM')
+        .then(function(res) {
+            if(res.currentWeek) currentWeekUi.innerText = res.currentWeek;
+            var textEl = document.getElementById('upcomingPMText');
+            if(!res || !res.success) {
+                textEl.innerHTML = "<span class='text-danger'>ไม่สามารถโหลดข้อมูลได้</span>";
+                window.upcomingPMData = null;
+                return;
+            }
+            if(res.hasUpcoming) {
+                textEl.innerHTML = `<b class="text-dark">ไลน์: ${res.lineName}</b><br><span class="badge bg-warning text-dark mt-2 px-3 shadow-sm border border-dark border-opacity-10">ใกล้สุด W${res.targetWeek}</span>`;
+                window.upcomingPMData = res; 
+             } else {
+                textEl.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> ไม่มีแผนระยะประชิด</span>`;
+                window.upcomingPMData = null;
+            }
+        }).catch(err => console.error(err));
+    }
+
+    function openUpcomingModal() {
+        var data = window.upcomingPMData;
+        if(!data) { openAlert("แจ้งเตือน", "ไม่มีข้อมูล PM ที่ใกล้ถึงกำหนด หรือข้อมูลอาจกำลังโหลดอยู่ครับ"); return; }
+        document.getElementById('upcomingLineName').innerText = data.lineName;
+        document.getElementById('upcomingWeekName').innerText = data.targetWeek;
+        
+        var tbody = document.getElementById('upcomingPMTableBody');
+        tbody.innerHTML = "";
+        data.items.forEach(function(item) {
+            tbody.innerHTML += `<tr>
+                <td class="text-start fw-bold text-primary ps-3">${item.machine}</td>
+                <td class="text-start text-muted">${item.part}</td>
+                <td><span class="badge bg-danger shadow-sm px-2">W${item.week}</span></td>
+            </tr>`;
+        });
+        var now = new Date();
+        var dStr = now.toISOString().split('T')[0];
+        var tStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+        document.getElementById('executePMDate').value = dStr;
+        document.getElementById('executePMTime').value = tStr;
+        new bootstrap.Modal(document.getElementById('upcomingPMDetailModal')).show();
+    }
+
+    function triggerImportCMMS() { document.getElementById('importFileInput').click(); }
+    function handleImportFile(input) {
+        var file = input.files[0]; if(!file) return;
+        openAlert("แจ้งเตือนการนำเข้าข้อมูล", "<i class='bi bi-info-circle-fill text-info fs-1 d-block mb-3 text-center'></i><div class='text-center'>ตรวจพบไฟล์: <b>" + file.name + "</b><br><br>ระบบกำลังรอการพัฒนาส่วนแกะข้อมูล (Data Parser) จาก CMMS องค์กร เพื่อนำเข้ามาจัดเรียงในระบบอัตโนมัติในเฟสถัดไปครับ</div>");
+        input.value = ""; 
+    }
+
+    function loadHistoryLogs() {
+        showLoading("กำลังดึงประวัติการใช้งานระบบ...");
+        apiCall('getHistoryLogs')
+        .then(function(res) {
+            hideLoading();
+            if(!res || !res.success) { openAlert("เกิดข้อผิดพลาด", res ? res.message : "ดึงข้อมูลไม่สำเร็จ"); return; }
+            var tbody = document.getElementById('historyLogTableBody'); tbody.innerHTML = "";
+            if(res.data.length === 0) { tbody.innerHTML = "<tr><td colspan='6' class='text-muted py-4 fw-bold'>ไม่มีประวัติการใช้งาน</td></tr>";
+            } else {
+                res.data.forEach(function(log) {
+                    var actionColor = "bg-secondary";
+                    if(log.action.includes("Save") || log.action.includes("สร้าง")) actionColor = "bg-primary";
+                    if(log.action.includes("Update") || log.action.includes("อัปเดต")) actionColor = "bg-warning text-dark";
+                    if(log.action.includes("BD")) actionColor = "bg-danger";
+                    if(log.action.includes("PM")) actionColor = "bg-success";
+                    tbody.innerHTML += `<tr><td>${log.timestamp}</td><td class="fw-bold text-primary">${log.user}</td><td><span class="badge ${actionColor}">${log.action}</span></td><td>${log.line || '-'}</td><td>${log.machine || '-'}</td><td class="text-start text-muted">${log.detail}</td></tr>`;
+                });
+            }
+            new bootstrap.Modal(document.getElementById('historyLogModal')).show();
+        })
+        .catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); });
+    }
+
+    function resetAppUI() {
+      localStorage.removeItem('cmms_draft_form'); document.getElementById('masterForm').reset();
+      cascadeSetup('plan'); 
+      var mImg = document.getElementById('imgMachine').nextElementSibling; mImg.src = ""; mImg.style.display = "none"; mImg.removeAttribute('data-existing-url'); document.getElementById('imgMachine').previousElementSibling.style.display = "flex";
+      document.getElementById('subSystemsContainer').innerHTML = ""; addSubsystemCard(); switchView('setup');
+    }
+
+    function resetToHome() { openConfirm("เมนูหลัก", "คุณต้องการล้างข้อมูลฟอร์มปัจจุบัน หรือกลับไปหน้า Dashboard?", function() { resetAppUI(); if(currentUserRole === '3' || currentUserRole === '4') { switchView('dashboard'); } }); }
+    
+    function logout() { 
+      openConfirm("ออกจากระบบ", "คุณต้องการออกจากระบบใช่หรือไม่?", function() { 
+         localStorage.removeItem('cmms_user_session'); document.getElementById('loginSection').style.display = 'flex'; document.getElementById('mainAppSection').style.display = 'none'; document.getElementById('floatingMenu').style.display = 'none'; 
+         var fab = document.getElementById('floatingMenu'); if(fab.classList.contains('active')) toggleFab();
+         document.getElementById('btnHistoryLog').classList.add('d-none'); document.getElementById('btnManageUsers').classList.add('d-none'); document.getElementById('btnDashboard').classList.add('d-none');
+         document.getElementById('loginForm').reset(); currentUserRole = ""; resetAppUI();
+      });
+    }
+
+    // =========================================================================
+    // 💾 ระบบร่างและซิงค์ข้อมูล (Drafting & Sync)
+    // =========================================================================
+
+    function saveDraftToLocal() {
+        var draft = { plan: document.getElementById('machinePlan').value, type: document.getElementById('machineType').value, lineSelect: document.getElementById('lineNameSelect').value, lineInput: document.getElementById('lineNameInput').value, machineSelect: document.getElementById('machineNameSelect').value, machineInput: document.getElementById('machineNameInput').value, timestamp: new Date().getTime() };
+        if(!draft.plan) return; localStorage.setItem('cmms_draft_form', JSON.stringify(draft));
+    }
+    setInterval(saveDraftToLocal, 60000);
+
+    function loadDraftFromLocal() {
+        var draftStr = localStorage.getItem('cmms_draft_form');
+        if(draftStr) {
+            try {
+                var draft = JSON.parse(draftStr);
+                var now = new Date().getTime(); if(now - draft.timestamp > 86400000) { localStorage.removeItem('cmms_draft_form'); return; }
+                
+                if(draft.plan || draft.type || draft.lineSelect || draft.machineSelect) {
+                    openConfirm("พบข้อมูลที่กรอกค้างไว้", "คุณมีข้อมูลโครงสร้างเครื่องจักรที่กรอกค้างไว้ ต้องการกู้คืนหรือไม่?", function() {
+                        switchView('setup'); document.getElementById('machinePlan').value = draft.plan || ""; cascadeSetup('plan'); document.getElementById('machineType').value = draft.type || ""; cascadeSetup('type');
+                        
+                        var lineSel = document.getElementById('lineNameSelect');
+                        if(draft.lineSelect === 'NEW_LINE') { lineSel.value = 'NEW_LINE'; cascadeSetup('line'); document.getElementById('lineNameInput').value = draft.lineInput || ""; } else if (draft.lineSelect) { if(!Array.from(lineSel.options).some(opt => opt.value === draft.lineSelect)) lineSel.add(new Option(draft.lineSelect, draft.lineSelect)); 
+                        lineSel.value = draft.lineSelect; cascadeSetup('line');
+                        }
+                        
+                        var machSel = document.getElementById('machineNameSelect');
+                        if(draft.machineSelect === 'NEW_MACHINE') { machSel.value = 'NEW_MACHINE'; cascadeSetup('machine'); document.getElementById('machineNameInput').value = draft.machineInput || "";
+                        } else if (draft.machineSelect) { if(!Array.from(machSel.options).some(opt => opt.value === draft.machineSelect)) machSel.add(new Option(draft.machineSelect, draft.machineSelect)); machSel.value = draft.machineSelect; cascadeSetup('machine');
+                        }
+                    });
+                }
+            } catch(e) { console.log("Draft parse error:", e); }
+        }
+    }
+
+    function loadInitialData() {
+      showLoading('กำลังซิงค์ข้อมูล (อาจใช้เวลาสักครู่หากฐานข้อมูลมีขนาดใหญ่)...');
+      apiCall('getExistingPartsData')
+        .then(function(parts) {
+          globalPartsData = parts || []; var dataList = document.getElementById('partDataList'); 
+          if(dataList) { 
+              dataList.innerHTML = ""; 
+              globalPartsData.forEach(function(p) { 
+                  if(p.partName || p.partId) { 
+                      var option = document.createElement('option'); var searchTerms = []; 
+                      if(p.partId) searchTerms.push(p.partId); if(p.partName) searchTerms.push(p.partName); if(p.partNumber || p.model) searchTerms.push(p.partNumber || p.model); 
+                      option.value = searchTerms.join(" | "); dataList.appendChild(option); 
+                  } 
+              }); 
+          }
+          return apiCall('getExistingMachines');
+        })
+        .then(function(machinesObj) { 
+            globalMachinesData = machinesObj || []; 
+            cascadeSetup('plan'); populatePMDropdowns(); updateDashboardKPIs(); 
+            hideLoading(); addSubsystemCard(); setTimeout(loadDraftFromLocal, 1000); 
+            fetchUpcomingDashboardData();
+        })
+        .catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", "ซิงค์ข้อมูลไม่สำเร็จ: " + err.message); });
+    }
+
+    function cascadeSetup(step) {
+        var planSel = document.getElementById('machinePlan');
+        var typeSel = document.getElementById('machineType'); var lineSel = document.getElementById('lineNameSelect'); var lineInput = document.getElementById('lineNameInput'); var machSel = document.getElementById('machineNameSelect'); var machInput = document.getElementById('machineNameInput');
+        if (step === 'plan') { if (planSel.value) { typeSel.disabled = false;
+        if(!typeSel.value) typeSel.innerHTML = '<option value="">- เลือก Type -</option><option value="Packing">Packing</option><option value="Mixing">Mixing</option>'; } else { typeSel.disabled = true; typeSel.value = "";
+        } step = 'type'; }
+        
+        if (step === 'type') { if (typeSel.value && planSel.value) { lineSel.disabled = false;
+        var validLines = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value && m.type === typeSel.value).map(m => m.lineName))].filter(Boolean);
+        lineSel.innerHTML = '<option value="">- เลือก Line -</option><option value="NEW_LINE" class="fw-bold bg-primary text-white">+ สร้างไลน์ใหม่</option>'; validLines.forEach(l => lineSel.add(new Option(l, l)));
+        } else { lineSel.disabled = true; lineSel.innerHTML = '<option value="">- ล็อก -</option>'; lineInput.classList.add('d-none'); lineInput.required = false; } step = 'line';
+        }
+        
+        if (step === 'line') { if (lineSel.value === 'NEW_LINE') { lineInput.classList.remove('d-none');
+        lineInput.value = ''; lineInput.required = true; machSel.disabled = false; machSel.innerHTML = '<option value="">- เลือก Machine -</option><option value="NEW_MACHINE" class="fw-bold bg-primary text-white">+ สร้างเครื่องใหม่</option>';
+        } else if (lineSel.value) { lineInput.classList.add('d-none'); lineInput.required = false; machSel.disabled = false;
+        var validMachines = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value && m.type === typeSel.value && m.lineName === lineSel.value).map(m => m.machineName))].filter(Boolean);
+        machSel.innerHTML = '<option value="">- เลือก Machine -</option><option value="NEW_MACHINE" class="fw-bold bg-primary text-white">+ สร้างเครื่องใหม่</option>'; validMachines.forEach(m => machSel.add(new Option(m, m)));
+        } else { machSel.disabled = true; machSel.innerHTML = '<option value="">- ล็อก -</option>'; machInput.classList.add('d-none'); machInput.required = false; } step = 'machine';
+        }
+        
+        if (step === 'machine') { var mImg = document.getElementById('imgMachine').nextElementSibling;
+        if (machSel.value === 'NEW_MACHINE') { machInput.classList.remove('d-none'); machInput.value = ''; machInput.required = true; mImg.src = ""; mImg.style.display = "none"; mImg.removeAttribute('data-existing-url');
+        document.getElementById('imgMachine').previousElementSibling.style.display = "flex"; document.getElementById('subSystemsContainer').innerHTML = ""; addSubsystemCard(); } else if (machSel.value) { machInput.classList.add('d-none'); machInput.required = false; checkAndLoadExistingMachine(machSel.value);
+        } else { machInput.classList.add('d-none'); machInput.required = false; } }
+    }
+
+    // =========================================================================
+    // 📅 ระบบตาราง PM (PM Table Features)
+    // =========================================================================
+
+    function populatePMDropdowns() { var uniquePlans = [...new Set(globalMachinesData.map(m => m.plan))].filter(Boolean);
+        var planSel = document.querySelector('.pm-plan-search'); planSel.innerHTML = '<option value="">- เลือก Plan -</option>';
+        uniquePlans.forEach(v => { var opt = document.createElement('option'); opt.value = v; opt.innerText = v; planSel.appendChild(opt); }); cascadePM('reset');
+    }
+    
+    function cascadePM(step) {
+        var planSel = document.querySelector('.pm-plan-search');
+        var typeSel = document.querySelector('.pm-type-search'); var lineSel = document.querySelector('.pm-line-search'); var machSel = document.querySelector('.pm-machine-search');
+        
+        if (step === 'reset') { typeSel.disabled = true;
+        typeSel.innerHTML = '<option value="">- ล็อก -</option>'; lineSel.disabled = true; lineSel.innerHTML = '<option value="">- ล็อก -</option>'; machSel.disabled = true;
+        machSel.innerHTML = '<option value="">- ล็อก -</option>'; return; }
+        
+        if (step === 'plan') { if (planSel.value) { typeSel.disabled = false;
+        var validTypes = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value).map(m => m.type))].filter(Boolean); typeSel.innerHTML = '<option value="">- เลือก Type -</option>';
+        validTypes.forEach(v => typeSel.add(new Option(v, v))); } else { typeSel.disabled = true; typeSel.innerHTML = '<option value="">- ล็อก -</option>';
+        } step = 'type'; }
+        
+        if (step === 'type') { if (typeSel.value && planSel.value) { lineSel.disabled = false;
+        var validLines = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value && m.type === typeSel.value).map(m => m.lineName))].filter(Boolean);
+        lineSel.innerHTML = '<option value="">- เลือก Line -</option>'; validLines.forEach(v => lineSel.add(new Option(v, v))); } else { lineSel.disabled = true;
+        lineSel.innerHTML = '<option value="">- ล็อก -</option>'; } step = 'line';
+        }
+        
+        if (step === 'line') { if (lineSel.value) { machSel.disabled = false;
+        var validMachines = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value && m.type === typeSel.value && m.lineName === lineSel.value).map(m => m.machineName))].filter(Boolean);
+        machSel.innerHTML = '<option value="">-- ดูภาพรวมทุกเครื่องในไลน์ --</option>'; validMachines.forEach(v => machSel.add(new Option(v, v))); } else { machSel.disabled = true;
+        machSel.innerHTML = '<option value="">- ล็อก -</option>'; } }
+    }
+
+    function handlePMFilterSubmit(btn) { var container = btn.closest('.pm-filter-container');
+        var lineVal = container.querySelector('.pm-line-search').value; var machVal = container.querySelector('.pm-machine-search').value; if (machVal) { currentMachinePM = machVal; loadPMPlan(null);
+        } else if (lineVal) { loadLinePMOverview(container); } else { openAlert("แจ้งเตือน", "กรุณาเลือก <b>'ไลน์ผลิต (Line)'</b> ก่อนดึงข้อมูล");
+        } 
+    }
+    
+    function loadLinePMOverview(containerOrBtn) {
+      var container = containerOrBtn.classList ? containerOrBtn.closest('.pm-filter-container') : containerOrBtn; var lineName = container.querySelector('.pm-line-search').value; showLoading('กำลังประมวลผลแผน PM ทั้งไลน์...');
+      apiCall('getLinePMData', { lineName: lineName })
+      .then(function(res) { 
+          hideLoading(); 
+          if(!res || !res.success) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-danger fw-bold"><i class="bi bi-exclamation-triangle fs-1 d-block mb-3"></i>${res ? res.message : "ดึงข้อมูลไม่สำเร็จ"}</div>`; return; } 
+          var data = res.data; if(!data || data.length === 0) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-warning fw-bold"><i class="bi bi-inbox fs-1 d-block mb-3"></i>ไม่พบแผนบำรุงรักษาในไลน์ผลิตนี้</div>`; return; } 
+          renderLineOverviewTable(data, lineName); 
+      }).catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); });
+    }
+
+    function renderLineOverviewTable(machinesData, lineName) {
+      var currentWeek = getWeekNumber(new Date());
+      var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 1); var endW = pmShowAllWeeks ?
+      52 : Math.min(52, currentWeek + 6); 
+      
+      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-light p-3 rounded shadow-sm border-start border-5 border-primary"><span class="text-primary fw-bold fs-5"><i class="bi bi-building"></i> แผนซ่อมบำรุงรวม: ${lineName}</span><button class="btn btn-sm btn-outline-primary fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadLinePMOverview(document.querySelector('.pm-filter-container'));"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ?
+      "ย่อดูแผนรายเดือน" : "แสดงเต็มปี"}</button></div>`;
+      
+      var html = toggleBtn + `<div class="table-pm-container"><table class="table table-pm mb-0 table-hover"><thead><tr><th class="sticky-col-1" style="min-width: 250px; background: #0d6efd;">เครื่องจักรในไลน์ (Machine)</th><th class="bg-primary text-white">ชิ้นส่วนที่ต้องดูแล</th>`;
+      for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-warning text-dark fs-5' : 'bg-primary text-white'}">W${w}</th>`;
+      } html += `</tr></thead><tbody>`;
+      
+      machinesData.forEach(mach => {
+        var machineWeeks = {}; for(var w=1; w<=52; w++) machineWeeks[w] = { hasPlan: false, pmCount: 0, bdCount: 0 }; var pmPartsCount = 0;
+        mach.parts.forEach(p => { if(!p.pmFrequency) return; pmPartsCount++; var freqNum = extractWeeks(p.pmFrequency); var historyMap = p.pmHistory || {}; var historyWeeks = Object.keys(historyMap).map(Number); var rawDate = parseEuroToDateInput(p.lastPMDate); var planWeeks = calculatePlannedWeeks(historyWeeks, freqNum, rawDate); planWeeks.forEach(w => { if(w<=52) machineWeeks[w].hasPlan = true; }); for(var w in historyMap) { if(historyMap[w] === 'PM') machineWeeks[w].pmCount++; if(historyMap[w] === 'BD') machineWeeks[w].bdCount++; } });
+     
+        html += `<tr><td class="sticky-col-1 text-start fw-bold text-dark border-end-0 bg-white"><button class="btn btn-outline-primary w-100 text-start fw-bold shadow-sm d-flex justify-content-between align-items-center" onclick="drillDownToMachine('${mach.machineName}')" title="คลิกเพื่อเจาะลึกดูรายการอะไหล่"><span><i class="bi bi-cpu-fill me-2"></i>${mach.machineName}</span><i class="bi bi-search small"></i></button></td><td class="fw-bold text-muted bg-light">${pmPartsCount} รายการ</td>`;
+        for(var w = startW; w <= endW; w++) {
+            var cellData = machineWeeks[w];
+            var displayHtml = "<span class='text-black-50 opacity-25'>-</span>"; var bgClass = "";
+            if (cellData.bdCount > 0) { displayHtml = `<span class="badge bg-danger shadow-sm"><i class="bi bi-exclamation-triangle"></i> เสีย (${cellData.bdCount})</span>`; bgClass = "bg-danger bg-opacity-10";
+            } 
+            else if (cellData.pmCount > 0) { displayHtml = `<span class="badge bg-success shadow-sm"><i class="bi bi-check-circle"></i> ทำแล้ว</span>`;
+            bgClass = "bg-success bg-opacity-10"; } 
+            else if (cellData.hasPlan) { displayHtml = `<div class="ticket-seat seat-plan mx-auto shadow-sm" title="มีแผนซ่อมบำรุง">P</div>`;
+            bgClass = "bg-warning bg-opacity-10 border-start border-end border-warning"; }
+            html += `<td class="text-center align-middle ${bgClass} ${w === currentWeek ? 'border border-primary border-2' : ''}">${displayHtml}</td>`;
+        } html += `</tr>`;
+      }); html += `</tbody></table></div>`; document.getElementById('pmTableWrapper').innerHTML = html;
+    }
+
+    function drillDownToMachine(machineName) { var selectEl = document.querySelector('.pm-machine-search'); var optExists = Array.from(selectEl.options).some(opt => opt.value === machineName);
+        if(!optExists) { var opt = document.createElement('option'); opt.value = machineName; opt.innerText = machineName; selectEl.appendChild(opt); } selectEl.value = machineName; currentMachinePM = machineName;
+        loadPMPlan(null); 
+    }
+
+    function loadPMPlan(btn) {
+      if (btn) { var container = btn.closest('.pm-filter-container'); currentMachinePM = container.querySelector('.pm-machine-search').value; }
+      var mName = currentMachinePM; if(!mName) { openAlert("แจ้งเตือน", "ระบบไม่พบชื่อเครื่องจักรเป้าหมาย"); return; }
+      showLoading('กำลังเจาะลึกตารางอะไหล่...');
+      
+      apiCall('getMachineStructureDetails', { machineName: mName })
+      .then(function(res) {
+        hideLoading(); 
+        if(!res || !res.success) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-danger fw-bold"><i class="bi bi-exclamation-triangle fs-1 d-block mb-3"></i>${res ? res.message : "ดึงข้อมูลไม่สำเร็จ"}</div>`; return; }
+        var data = res.data; if(!data || !data.subSystems || data.subSystems.length === 0) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-warning fw-bold"><i class="bi bi-inbox fs-1 d-block mb-3"></i>ไม่พบข้อมูลในเครื่องจักรนี้</div>`; return; } render52WeekTable(data.subSystems);
+      }).catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); });
+    }
+
+    function render52WeekTable(subSystems) {
+      var currentWeek = getWeekNumber(new Date());
+      var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 2); var endW = pmShowAllWeeks ?
+      52 : Math.min(52, currentWeek + 2);
+      
+      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border border-success border-start-0 border-end-0 border-top-0 border-bottom-5"><span class="text-success fw-bold ms-2 fs-5"><i class="bi bi-gear"></i> รายการอะไหล่: ${currentMachinePM} (ปัจจุบัน W${currentWeek})</span><button class="btn btn-sm btn-outline-success fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadPMPlan(null);"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ?
+      "ย่อดู 5 สัปดาห์" : "แสดงเต็มปี"}</button></div>`;
+      
+      var html = toggleBtn + `<div class="table-pm-container"><table class="table table-pm mb-0"><thead><tr><th class="sticky-col-1">ระบบ ➔ กลุ่ม</th><th class="sticky-col-2">รายละเอียดชิ้นส่วน (Part Details)</th>`;
+      for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-success text-white fs-5' : ''}">W${w}</th>`;
+      } html += `</tr></thead><tbody>`;
+      
+      subSystems.forEach(sub => {
+        sub.partGroups.forEach(group => {
+          group.parts.forEach((p, pIdx) => {
+            if(!p.pmFrequency) return; var freqNum = extractWeeks(p.pmFrequency); var historyMap = p.pmHistory || {}; var historyWeeks = Object.keys(historyMap).map(Number); var rawDate = parseEuroToDateInput(p.lastPMDate); var planWeeks = calculatePlannedWeeks(historyWeeks, freqNum, rawDate); 
+            
+            var groupNameHtml = ''; if (pIdx === 0) { 
+              groupNameHtml = `<td class="sticky-col-1 bg-light align-middle border-end-0" rowspan="${group.parts.length}"><div class="fw-bold text-dark fs-6 text-wrap lh-sm mb-1">${sub.subSystemName}</div><div class="text-success fw-bold text-wrap lh-sm" style="font-size:0.75rem;"><i class="bi bi-arrow-return-right"></i> ${group.groupName}</div></td>`; } else { groupNameHtml = `<td class="sticky-col-1 d-none"></td>`; }
+            var classBg = p.classification === 'A' ? 'bg-danger' : (p.classification === 'B' ?
+            'bg-warning text-dark' : 'bg-success');
+            html += `<tr data-partname="${p.partName}" data-freq="${freqNum}" data-lastpm="${rawDate || ''}">${groupNameHtml}<td class="sticky-col-2 border-start-0"><div class="fw-bold text-dark text-wrap fs-6 mb-1">${p.partName}</div><div class="text-muted mb-2" style="font-size:0.75rem;">P/N: ${p.partNumber ||
+            '-'} | ID: ${p.partId || '-'}</div><div class="d-flex flex-wrap gap-1" style="font-size:0.75rem;"><span class="badge bg-light text-dark border"><i class="bi bi-gear"></i> Std: ${p.pmStandard ||
+            '-'}</span><span class="badge ${classBg}">Class ${p.classification || '-'}</span><span class="badge bg-danger text-white"><i class="bi bi-calendar-week"></i> Freq: ${p.pmFrequency}</span></div></td>`;
+            for(var w = startW; w <= endW; w++) {
+              var recordedType = historyMap[w];
+              var isPlan = planWeeks.includes(w); var cssClass = "ticket-seat"; var displayChar = "-";
+              
+              if(recordedType === "PM") { cssClass += " seat-pm";
+              displayChar = "PM"; } else if(recordedType === "BD") { cssClass += " seat-bd"; displayChar = "BD";
+              } else if(isPlan) { cssClass += " seat-plan"; displayChar = "P";
+              }
+              html += `<td class="text-center ${w === currentWeek ? 'bg-warning bg-opacity-10' : ''}"><div class="${cssClass}" onclick="openActionModal(this, ${w})">${displayChar}</div></td>`;
+            } html += `</tr>`;
+          });
+        });
+      }); html += `</tbody></table></div>`; document.getElementById('pmTableWrapper').innerHTML = html;
+    }
+
+    function calculatePlannedWeeks(historyArr, interval, lastPMDateStr) {
+      interval = parseInt(interval);
+      if(isNaN(interval) || interval <= 0) return []; var plans = []; var baseWeek = 0;
+      if(historyArr && historyArr.length > 0) { baseWeek = Math.max(...historyArr); } else if(lastPMDateStr) { baseWeek = getWeekNumber(lastPMDateStr);
+      }
+      var nextPlan = baseWeek > 0 ? baseWeek + interval : interval;
+      var safeCount = 0; while(nextPlan <= 52 && safeCount < 100) { plans.push(nextPlan); nextPlan += interval; safeCount++; } return plans;
+    }
+
+    function openActionModal(cellEl, weekNum) { targetActionCell = cellEl; targetActionWeek = weekNum; document.getElementById('targetWeekSpan').innerText = weekNum; new bootstrap.Modal(document.getElementById('actionModal')).show(); }
+    
+    function triggerActionConfirm(actionType) {
+      pendingActionType = actionType;
+      var actionText = actionType === 'PM' ? 'ทำตามแผน (PM)' : actionType === 'BD' ? 'เครื่องพัง (BD)' : 'ล้างข้อมูล';
+      document.getElementById('confirmModalBody').innerText = "คุณต้องการบันทึกการ " + actionText + " ในสัปดาห์ W" + targetActionWeek + " ใช่หรือไม่?";
+      document.getElementById('confirmModalBtn').onclick = function() { executeActionSave();
+      }; new bootstrap.Modal(document.getElementById('confirmModal')).show();
+    }
+    
+    // API: บันทึกสถานะ PM กลับ
+    function executeActionSave() {
+      var sessionStr = localStorage.getItem('cmms_user_session');
+      if (!sessionStr) { openAlert("Error", "ไม่พบเซสชั่น กรุณาล็อกอินใหม่"); return; }
+      var sessionToken = JSON.parse(sessionStr).token;
+
+      bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide(); bootstrap.Modal.getInstance(document.getElementById('actionModal')).hide();
+      var cellEl = targetActionCell; var w = targetActionWeek; var tr = cellEl.closest('tr'); var partName = tr.getAttribute('data-partname');
+      showLoading('กำลังบันทึกประวัติการทำ PM...');
+      
+      apiCall('updatePMWeekAction', { machineName: currentMachinePM, partName: partName, weekNum: w, typeValue: pendingActionType, token: sessionToken })
+         .then(function(res) { 
+             hideLoading(); 
+             if(res.success) { loadPMPlan(null); } else { openAlert("ปฏิเสธการเข้าถึง", res.message); }
+         }).catch(function(e) { hideLoading(); openAlert("Error", "บันทึกไม่ได้: " + e.message); });
+    }
+
+    // =========================================================================
+    // ➕ ระบบเพิ่มลด Elements ในหน้า Form
+    // =========================================================================
+
+    function addSubsystemCard() { var container = document.getElementById('subSystemsContainer');
+      var clone = document.getElementById('subSystemTemplate').content.cloneNode(true); container.appendChild(clone); addPartGroupCard(container.lastElementChild.querySelector('.btn-outline-primary')); updateCardIndexes();
+    }
+    function addPartGroupCard(btn) { var container = btn.closest('.sub-system-card').querySelector('.groups-container');
+      var clone = document.getElementById('partGroupTemplate').content.cloneNode(true); container.appendChild(clone); addPartToGroup(container.lastElementChild.querySelector('.btn-success')); updateGroupIndexes(container);
+    }
+    function addPartToGroup(btn) {
+      var partsContainer = btn.closest('.part-group-card').querySelector('.parts-container');
+      var clone = document.getElementById('partTemplate').content.cloneNode(true);
+      partsContainer.appendChild(clone);
+      var allParts = partsContainer.querySelectorAll('.part-item'); if(allParts.length === 1) allParts[0].querySelector('.btn-remove-part').style.display = "none";
+      else allParts.forEach(p => p.querySelector('.btn-remove-part').style.display = "block");
+    }
+    function removeSubsystem(btn) { btn.closest('.sub-system-card').remove(); updateCardIndexes();
+    }
+    function removePartGroup(btn) { var container = btn.closest('.groups-container');
+        btn.closest('.part-group-card').remove(); updateGroupIndexes(container);
+    }
+    function removePart(btn) { var container = btn.closest('.parts-container'); btn.closest('.part-item').remove(); var allParts = container.querySelectorAll('.part-item');
+      if(allParts.length === 1) allParts[0].querySelector('.btn-remove-part').style.display = "none"; }
+    function updateCardIndexes() { var cards = document.querySelectorAll('.sub-system-card');
+      cards.forEach((card, index) => { card.querySelector('.sub-idx').innerText = index + 1; if(index === 0 && cards.length === 1) card.querySelector('.btn-remove-sub').style.display = "none"; else card.querySelector('.btn-remove-sub').style.display = "block"; });
+    }
+    function updateGroupIndexes(container) { var groups = container.querySelectorAll('.part-group-card');
+      groups.forEach((g, idx) => { if(idx === 0 && groups.length === 1) g.querySelector('.btn-remove-group').style.display = "none"; else g.querySelector('.btn-remove-group').style.display = "block"; });
+    }
+    
+    function previewDynamicFile(input) { var preview = input.nextElementSibling; var uploadBox = input.previousElementSibling;
+      var file = input.files[0]; if (file) { var reader = new FileReader(); reader.onloadend = function() { preview.src = reader.result;
+      preview.style.display = "block"; uploadBox.style.display = "none"; }; reader.readAsDataURL(file); } }
+    
+    function getBase64(file) { 
+        return new Promise((resolve) => { if (!file) { resolve(""); return; } const reader = new FileReader(); reader.readAsDataURL(file); 
+            reader.onload = (event) => { const img = new Image(); img.src = event.target.result;
+                img.onload = () => { const canvas = document.createElement('canvas'); const MAX_WIDTH = 800; const MAX_HEIGHT 
+                = 800; let width = img.width; let height = img.height;
+                   if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                   canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                }; } });
+    }
+    
+    function autoFillPartInfo(input) { 
+        var val = input.value.split(" | ")[0].trim();
+        if(!val) return;
+        var match = globalPartsData.find(p => (p.partId && String(p.partId).trim() === val) || (p.partName && String(p.partName).trim() === val) || (p.model && String(p.model).trim() === val) || (p.partNumber && String(p.partNumber).trim() === val));
+        if(match) { 
+            var box = input.closest('.part-item');
+            box.querySelector('.input-partname').value = match.partName || ""; box.querySelector('.input-partid').value = match.partId || ""; box.querySelector('.input-partnum').value = match.partNumber || match.model || "";
+            box.querySelector('.input-dim').value = match.dimensions || "";
+            if(match.imageUrl) { var imgPreview = box.querySelector('.preview-img'); var uploadBox = box.querySelector('.upload-box'); imgPreview.src = match.imageUrl;
+            imgPreview.style.display = "block"; uploadBox.style.display = "none"; imgPreview.setAttribute('data-existing-url', match.imageUrl); } 
+        } 
+    }
+
+    // =========================================================================
+    // 🚀 ระบบการเซฟข้อมูลหลัก (Main Save Feature)
+    // =========================================================================
+
+    // API: การอัปโหลดรูปแบบ Async 
+    function uploadImgToServer(base64, fileName, folderName) {
+        return new Promise((resolve, reject) => {
+            if(!base64 || !base64.startsWith("data:image")) { resolve(base64); return; } 
+            apiCall('uploadSingleImageBackend', { base64Data: base64, fileName: fileName, folderName: folderName })
+              .then(resolve).catch(reject);
+        });
+    }
+
+    // API: Save Master Data
+    async function handleFormSubmit() {
+      var sessionStr = localStorage.getItem('cmms_user_session');
+      if (!sessionStr) { openAlert("Error", "ไม่พบเซสชั่น กรุณาล็อกอินใหม่"); return; }
+      var sessionToken = JSON.parse(sessionStr).token;
+      showLoading('กำลังเตรียมข้อมูลรูปภาพ...', 'ขั้นตอนนี้อาจใช้เวลา 1-2 นาที หากมีรูปจำนวนมาก ห้ามปิดหน้าต่างนี้');
+      
+      try {
+          var lName = document.getElementById('lineNameSelect').value;
+          if(lName === 'NEW_LINE') lName = document.getElementById('lineNameInput').value;
+          var mName = document.getElementById('machineNameSelect').value; if(mName === 'NEW_MACHINE') mName = document.getElementById('machineNameInput').value;
+          showLoading('กำลังอัปโหลด...', '1/3 ภาพเครื่องจักรหลัก');
+          var mImgPreview = document.getElementById('imgMachine').nextElementSibling;
+          var mBase64 = await getBase64(document.getElementById('imgMachine').files[0]); 
+          if(!mBase64) mBase64 = mImgPreview.getAttribute('data-existing-url') || "";
+          var finalMachineImg = await uploadImgToServer(mBase64, mName + "_Main.jpg", "1_Machine_Images");
+          
+          var payload = { lineName: lName, machineName: mName, plan: document.getElementById('machinePlan').value, machineType: document.getElementById('machineType').value, setupUser: document.getElementById('setupUserInput').value, machineImg: finalMachineImg, subSystems: [] };
+          var subCards = document.querySelectorAll('.sub-system-card');
+          
+          for (var i = 0; i < subCards.length; i++) {
+            var card = subCards[i];
+            var sName = card.querySelector('.input-subname').value;
+            showLoading('กำลังอัปโหลด...', `2/3 ภาพระบบย่อย (${i+1}/${subCards.length})`);
+            
+            var sImgPreview = card.querySelector('.file-sub-img').nextElementSibling; 
+            var sBase64 = await getBase64(card.querySelector('.file-sub-img').files[0]);
+            if(!sBase64) sBase64 = sImgPreview.getAttribute('data-existing-url') || "";
+            var finalSubImg = await uploadImgToServer(sBase64, sName + "_Sub.jpg", "2_Sub_System_Images");
+            
+            var subData = { subSystemName: sName, subImg: finalSubImg, partGroups: [] }; 
+            var groupCards = card.querySelectorAll('.part-group-card');
+            
+            for(var j=0; j < groupCards.length; j++) {
+               var gCard = groupCards[j];
+               var gName = gCard.querySelector('.input-groupname').value;
+               
+               var gImgPreview = gCard.querySelector('.file-group-img').nextElementSibling; 
+               var gBase64 = await getBase64(gCard.querySelector('.file-group-img').files[0]); 
+               if(!gBase64) gBase64 = gImgPreview.getAttribute('data-existing-url') || "";
+               var finalGroupImg = await uploadImgToServer(gBase64, gName + "_Grp.jpg", "2_Sub_System_Images");
+
+               var groupData = { groupName: gName, groupImg: finalGroupImg, parts: [] };
+               var partItems = gCard.querySelectorAll('.part-item');
+               
+               for(var k=0; k < partItems.length; k++) {
+                  var pItem = partItems[k];
+                  var pName = pItem.querySelector('.input-partname').value.split(" | ")[1] || pItem.querySelector('.input-partname').value;
+                  showLoading('กำลังอัปโหลด...', `3/3 ภาพชิ้นส่วนอะไหล่: ${pName}`);
+                  
+                  var pImgPreview = pItem.querySelector('.preview-img');
+                  var pBase64 = await getBase64(pItem.querySelector('.file-exp-img').files[0]); 
+                  var pExisting = pImgPreview.getAttribute('data-existing-url') || ""; 
+                  var finalPBase64 = pBase64 ? pBase64 : pExisting;
+                  var finalPartImg = await uploadImgToServer(finalPBase64, pName + "_Part.jpg", "3_Part_Exploded_Images");
+                  
+                  groupData.parts.push({ 
+                      partName: pName, partId: pItem.querySelector('.input-partid').value, partNumber: pItem.querySelector('.input-partnum').value,
+                      dimensions: pItem.querySelector('.input-dim').value, pmFrequency: pItem.querySelector('.input-pm').value, pmStandard: pItem.querySelector('.input-pmstandard').value, classification: pItem.querySelector('.input-class').value, 
+                      standardDuration: pItem.querySelector('.input-duration').value || "", machineCondition: pItem.querySelector('.select-condition').value, maintenanceMethod: pItem.querySelector('.input-method').value, lastPMDate: formatDateToEuro(pItem.querySelector('.input-lastpm').value),
+                      vendor: "", expImg: finalPartImg 
+                  });
+               } 
+               subData.partGroups.push(groupData);
+            } 
+            payload.subSystems.push(subData);
+          }
+          
+          showLoading('ส่งข้อมูลสำเร็จ...', 'กำลังประมวลผลฐานข้อมูลขั้นสุดท้าย (ระบบความปลอดภัยสูง)');
+          var res = await apiCall('saveMachineMaster', { payload: payload, token: sessionToken });
+          hideLoading(); 
+          if(res.success) { 
+              localStorage.removeItem('cmms_draft_form');
+              openAlert("บันทึกสำเร็จ", "<i class='bi bi-check-circle-fill text-success fs-1 d-block mb-3 text-center'></i><div class='text-center'>" + res.messageTh + "</div>");
+          } else { openAlert("เกิดข้อผิดพลาด", res.messageTh); } 
+      } catch(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); }
+    }
+
+    function checkAndLoadExistingMachine(mName) {
+      if(!mName) return; showLoading('ดึงข้อมูลเครื่องเก่ามาแสดง...');
+      apiCall('getMachineStructureDetails', { machineName: mName })
+      .then(function(res) {
+        hideLoading(); 
+        if(!res || !res.success) { openAlert("แจ้งเตือน", res ? res.message : "เชื่อมต่อล้มเหลว"); return; } 
+        var data = res.data;
+        if(data && data.subSystems && data.subSystems.length > 0) {
+          document.getElementById('machinePlan').value = data.plan || ""; document.getElementById('machineType').value = data.machineType || "";
+          var lineSel = document.getElementById('lineNameSelect'); if(!Array.from(lineSel.options).some(opt => opt.value === data.lineName)) { lineSel.add(new Option(data.lineName, data.lineName)); } lineSel.value = data.lineName || "";
+          if(data.machineImg) { var 
+          mImg = document.getElementById('imgMachine').nextElementSibling; mImg.src = data.machineImg; mImg.style.display = "block"; mImg.setAttribute('data-existing-url', data.machineImg); document.getElementById('imgMachine').previousElementSibling.style.display = "none"; }
+          var container = document.getElementById('subSystemsContainer');
+          container.innerHTML = "";
+          data.subSystems.forEach(function(sub) {
+            addSubsystemCard(); var subCard = container.lastElementChild; subCard.querySelector('.input-subname').value = sub.subSystemName;
+            if(sub.subImg) { var sImg = subCard.querySelector('.file-sub-img').nextElementSibling; sImg.src = sub.subImg; sImg.style.display = "block"; sImg.setAttribute('data-existing-url', sub.subImg); subCard.querySelector('.file-sub-img').previousElementSibling.style.display = "none"; }
+            sub.partGroups.forEach(function(group, gIdx) {
+                if(gIdx > 0) addPartGroupCard(subCard.querySelector('.btn-outline-primary')); var groupCards = subCard.querySelectorAll('.part-group-card'); var gCard = groupCards[gIdx]; gCard.querySelector('.input-groupname').value = group.groupName;
+                if(group.groupImg) { var gImg = gCard.querySelector('.file-group-img').nextElementSibling; gImg.src = group.groupImg; gImg.style.display = "block"; gImg.setAttribute('data-existing-url', group.groupImg);
+                gCard.querySelector('.file-group-img').previousElementSibling.style.display = "none"; }
+                group.parts.forEach(function(p, pIdx) {
+                   if(pIdx > 0) addPartToGroup(gCard.querySelector('.btn-success')); var partItems = gCard.querySelectorAll('.part-item'); var pItem = partItems[pIdx];
+                    pItem.querySelector('.input-partname').value = p.partName; pItem.querySelector('.input-partid').value = p.partId; pItem.querySelector('.input-partnum').value = p.partNumber || ""; pItem.querySelector('.input-dim').value = p.dimensions;
+                    pItem.querySelector('.input-pm').value = p.pmFrequency; pItem.querySelector('.input-pmstandard').value = p.pmStandard || "TBM"; pItem.querySelector('.input-class').value = p.classification || "C"; pItem.querySelector('.input-duration').value = p.standardDuration;
+                    pItem.querySelector('.input-method').value = p.maintenanceMethod || ""; pItem.querySelector('.input-lastpm').value = parseEuroToDateInput(p.lastPMDate);
+                    if(p.imageUrl) { var pImg = pItem.querySelector('.preview-img');
+                    pImg.src = p.imageUrl; pImg.style.display = "block"; pImg.setAttribute('data-existing-url', p.imageUrl); pItem.querySelector('.upload-box').style.display = "none";
+                    }
+                });
+            });
+          });
+        } else { openAlert("แจ้งเตือน", "ไม่พบโครงสร้างอะไหล่"); }
+      }).catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); });
+    }
+    
+    window.onload = function() { checkSession(); };
+    
+    function checkSession() {
+        var sessionStr = localStorage.getItem('cmms_user_session');
+        if (sessionStr) {
+            try {
+                var session = JSON.parse(sessionStr);
+                var now = new Date().getTime();
+                if (now - session.timestamp > 43200000) { localStorage.removeItem('cmms_user_session'); return; }
+                session.timestamp = now;
+                localStorage.setItem('cmms_user_session', JSON.stringify(session));
+                document.getElementById('loginSection').style.display = 'none'; document.getElementById('mainAppSection').style.display = 'block';
+                document.getElementById('displayUserName').innerText = session.fullName; document.getElementById('setupUserInput').value = session.fullName;
+                document.getElementById('floatingMenu').style.display = 'flex';
+                currentUserRole = String(session.role).trim();
+                if(currentUserRole === '3' || currentUserRole === '4') {
+                    document.getElementById('btnHistoryLog').classList.remove('d-none');
+                    document.getElementById('btnManageUsers').classList.remove('d-none'); 
+                    switchView('dashboard');
+                } else {
+                    document.getElementById('btnHistoryLog').classList.add('d-none');
+                    document.getElementById('btnManageUsers').classList.add('d-none'); 
+                    switchView('setup');
+                }
+                if (typeof loadInitialData === "function") loadInitialData();
+            } catch (e) { console.log("Session parse error", e); }
+        }
+    }
+  </script>
+</body>
+</html>
