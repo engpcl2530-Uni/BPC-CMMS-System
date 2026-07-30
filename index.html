@@ -235,7 +235,7 @@
   <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content border-0 shadow-lg border-top border-4 border-warning">
-        <div class="modal-body text-center p-4">
+         <div class="modal-body text-center p-4">
           <i class="bi bi-question-circle text-warning" style="font-size: 3rem;"></i>
           <h5 class="fw-bold mt-3 mb-2" id="confirmModalTitle">ยืนยัน</h5>
           <p class="text-muted small mb-4" id="confirmModalBody">คุณต้องการดำเนินการต่อใช่หรือไม่?</p>
@@ -266,6 +266,7 @@
     </div>
   </div>
 
+  <!-- 📌 อัปเดตตาราง PM Plan: เพิ่มช่องค้นหาด่วน (Quick Search) -->
   <div class="modal fade" id="pmPlanModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content shadow-lg border-0">
@@ -274,7 +275,20 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body bg-light p-3 p-md-4">
+          
           <div class="card shadow-sm border-0 mb-4 p-3 p-md-4 bg-white pm-filter-container">
+            <!-- ค้นหาด่วนด้วยชื่อเครื่องจักร / QR Code Placeholder -->
+            <div class="row mb-3 pb-3 border-bottom">
+              <div class="col-12 col-md-8">
+                <label class="form-label text-primary"><i class="bi bi-search"></i> ค้นหาด่วน (พิมพ์ชื่อเครื่องจักร)</label>
+                <div class="input-group">
+                    <input type="text" class="form-control border-primary" id="quickMachineSearch" list="machineDataList" placeholder="พิมพ์เพื่อค้นหาเครื่องจักร หรือ Part Number ที่ต้องการ..." onchange="handleQuickSearch(this)">
+                    <button class="btn btn-outline-primary" type="button" title="สแกน QR Code (Coming Soon)"><i class="bi bi-qr-code-scan"></i></button>
+                </div>
+                <datalist id="machineDataList"></datalist>
+              </div>
+            </div>
+
             <div class="row g-3 align-items-end">
               <div class="col-6 col-md-2">
                 <label class="form-label text-success">1. Plan</label>
@@ -294,18 +308,20 @@
               </div>
               <div class="col-12 col-md-2">
                 <label class="form-label d-none d-md-block"> </label>
-                <button class="btn btn-primary w-100 fw-bold shadow-sm" onclick="handlePMFilterSubmit(this)"><i class="bi bi-search"></i> ดึงข้อมูล</button>
+                <button class="btn btn-primary w-100 fw-bold shadow-sm" onclick="handlePMFilterSubmit(this)"><i class="bi bi-funnel-fill"></i> กรองข้อมูล</button>
               </div>
             </div>
+            
             <div class="mt-4 text-muted small fw-bold text-center text-md-start">
               <span class="badge bg-success me-1 fs-6 px-3">PM</span> <span class="ms-1 align-middle">= ซ่อมตามแผน</span> 
               <span class="badge bg-danger ms-3 me-1 fs-6 px-3">BD</span> <span class="ms-1 align-middle">= เครื่องพัง</span> 
               <span class="badge bg-warning text-dark ms-3 me-1 fs-6 px-3">P</span> <span class="ms-1 align-middle">= แผนถัดไป</span>
             </div>
           </div>
+          
           <div class="card shadow-sm border-0 p-2 p-md-3 bg-white">
             <div id="pmTableWrapper">
-              <div class="p-5 text-center text-muted fw-bold fs-5"><i class="bi bi-inbox fs-1 d-block mb-3"></i>กรุณาเลือก ไลน์การผลิต ด้านบนเพื่อแสดงข้อมูล</div>
+              <div class="p-5 text-center text-muted fw-bold fs-5"><i class="bi bi-inbox fs-1 d-block mb-3"></i>กรุณาค้นหา หรือกรองข้อมูลด้านบนเพื่อแสดงตาราง</div>
             </div>
           </div>
         </div>
@@ -559,7 +575,7 @@
             </div>
             <div class="card-body bg-white">
                <div class="row g-3">
-                  <div class="col-12 col-md-9">
+                 <div class="col-12 col-md-9">
                   <div class="row g-3 align-items-end">
                     <div class="col-6">
                       <label class="form-label">1. Plan (แผนก)</label>
@@ -578,7 +594,7 @@
                       <div class="input-group shadow-sm rounded">
                         <select class="form-select fw-bold border-primary text-primary" id="lineNameSelect" onchange="cascadeSetup('line')" disabled required>
                           <option value="">- ล็อก -</option>
-                        </select>
+                         </select>
                         <input type="text" class="form-control d-none border-primary" id="lineNameInput" placeholder="พิมพ์ชื่อไลน์ผลิตใหม่...">
                       </div>
                     </div>
@@ -587,7 +603,7 @@
                       <div class="input-group shadow-sm rounded">
                         <select class="form-select fw-bold border-primary text-primary" id="machineNameSelect" onchange="cascadeSetup('machine')" disabled required>
                           <option value="">- ล็อก -</option>
-                        </select>
+                         </select>
                         <input type="text" class="form-control d-none border-primary" id="machineNameInput" placeholder="พิมพ์ชื่อเครื่องใหม่...">
                       </div>
                     </div>
@@ -1198,11 +1214,28 @@
     // 📅 ระบบตาราง PM (PM Table Features)
     // =========================================================================
 
-    function populatePMDropdowns() { var uniquePlans = [...new Set(globalMachinesData.map(m => m.plan))].filter(Boolean);
+    function populatePMDropdowns() { 
+        var uniquePlans = [...new Set(globalMachinesData.map(m => m.plan))].filter(Boolean);
         var planSel = document.querySelector('.pm-plan-search'); planSel.innerHTML = '<option value="">- เลือก Plan -</option>';
         uniquePlans.forEach(v => { var opt = document.createElement('option'); opt.value = v; opt.innerText = v; planSel.appendChild(opt); }); cascadePM('reset');
+        
+        // อัปเดตรายการ Datalist สำหรับ Quick Search
+        var dList = document.getElementById('machineDataList');
+        dList.innerHTML = "";
+        globalMachinesData.forEach(m => {
+           let opt = document.createElement('option');
+           opt.value = m.machineName;
+           dList.appendChild(opt);
+        });
     }
     
+    // 📌 ฟังก์ชันรองรับ Quick Search
+    function handleQuickSearch(input) {
+        if(input.value) {
+            drillDownToMachine(input.value);
+        }
+    }
+
     function cascadePM(step) {
         var planSel = document.querySelector('.pm-plan-search');
         var typeSel = document.querySelector('.pm-type-search'); var lineSel = document.querySelector('.pm-line-search'); var machSel = document.querySelector('.pm-machine-search');
@@ -1250,8 +1283,8 @@
       var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 1); var endW = pmShowAllWeeks ?
       52 : Math.min(52, currentWeek + 6); 
       
-      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-light p-3 rounded shadow-sm border-start border-5 border-primary"><span class="text-primary fw-bold fs-5"><i class="bi bi-building"></i> แผนซ่อมบำรุงรวม: ${lineName}</span><button class="btn btn-sm btn-outline-primary fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadLinePMOverview(document.querySelector('.pm-filter-container'));"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ?
-      "ย่อดูแผนรายเดือน" : "แสดงเต็มปี"}</button></div>`;
+      var exportBtn = `<button class="btn btn-sm btn-outline-success fw-bold ms-2" onclick="exportTableToCSV('PM_Plan_Line_${lineName}.csv')"><i class="bi bi-file-earmark-excel"></i> Export CSV</button>`;
+      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-light p-3 rounded shadow-sm border-start border-5 border-primary"><span class="text-primary fw-bold fs-5"><i class="bi bi-building"></i> แผนซ่อมบำรุงรวม: ${lineName}</span><div><button class="btn btn-sm btn-outline-primary fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadLinePMOverview(document.querySelector('.pm-filter-container'));"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ? "ย่อดูแผนรายเดือน" : "แสดงเต็มปี"}</button>${exportBtn}</div></div>`;
       
       var html = toggleBtn + `<div class="table-pm-container"><table class="table table-pm mb-0 table-hover"><thead><tr><th class="sticky-col-1" style="min-width: 250px; background: #0d6efd;">เครื่องจักรในไลน์ (Machine)</th><th class="bg-primary text-white">ชิ้นส่วนที่ต้องดูแล</th>`;
       for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-warning text-dark fs-5' : 'bg-primary text-white'}">W${w}</th>`;
@@ -1299,8 +1332,8 @@
       var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 2); var endW = pmShowAllWeeks ?
       52 : Math.min(52, currentWeek + 2);
       
-      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border border-success border-start-0 border-end-0 border-top-0 border-bottom-5"><span class="text-success fw-bold ms-2 fs-5"><i class="bi bi-gear"></i> รายการอะไหล่: ${currentMachinePM} (ปัจจุบัน W${currentWeek})</span><button class="btn btn-sm btn-outline-success fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadPMPlan(null);"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ?
-      "ย่อดู 5 สัปดาห์" : "แสดงเต็มปี"}</button></div>`;
+      var exportBtn = `<button class="btn btn-sm btn-outline-success fw-bold ms-2" onclick="exportTableToCSV('PM_Plan_Machine_${currentMachinePM}.csv')"><i class="bi bi-file-earmark-excel"></i> Export CSV</button>`;
+      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border border-success border-start-0 border-end-0 border-top-0 border-bottom-5"><span class="text-success fw-bold ms-2 fs-5"><i class="bi bi-gear"></i> รายการอะไหล่: ${currentMachinePM} (ปัจจุบัน W${currentWeek})</span><div><button class="btn btn-sm btn-outline-success fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadPMPlan(null);"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ? "ย่อดู 5 สัปดาห์" : "แสดงเต็มปี"}</button>${exportBtn}</div></div>`;
       
       var html = toggleBtn + `<div class="table-pm-container"><table class="table table-pm mb-0"><thead><tr><th class="sticky-col-1">ระบบ ➔ กลุ่ม</th><th class="sticky-col-2">รายละเอียดชิ้นส่วน (Part Details)</th>`;
       for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-success text-white fs-5' : ''}">W${w}</th>`;
@@ -1352,7 +1385,6 @@
       }; new bootstrap.Modal(document.getElementById('confirmModal')).show();
     }
     
-    // API: บันทึกสถานะ PM กลับ
     function executeActionSave() {
       var sessionStr = localStorage.getItem('cmms_user_session');
       if (!sessionStr) { openAlert("Error", "ไม่พบเซสชั่น กรุณาล็อกอินใหม่"); return; }
@@ -1367,6 +1399,31 @@
              hideLoading(); 
              if(res.success) { loadPMPlan(null); } else { openAlert("ปฏิเสธการเข้าถึง", res.message); }
          }).catch(function(e) { hideLoading(); openAlert("Error", "บันทึกไม่ได้: " + e.message); });
+    }
+
+    // 📌 ฟังก์ชันส่งออกตารางเป็นไฟล์ CSV
+    function exportTableToCSV(filename) {
+        var csv = [];
+        var rows = document.querySelectorAll(".table-pm-container table tr");
+        if (rows.length === 0) { openAlert("แจ้งเตือน", "ไม่มีข้อมูลสำหรับ Export"); return; }
+        
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td, th");
+            for (var j = 0; j < cols.length; j++) {
+                // จัดการตัดเว้นบรรทัดและใส่ double quotes เพื่อกันลูกน้ำในข้อความ
+                var data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""');
+                row.push('"' + data + '"');
+            }
+            csv.push(row.join(","));
+        }
+        var csvFile = new Blob(["\uFEFF"+csv.join("\n")], {type: "text/csv;charset=utf-8;"});
+        var downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
     }
 
     // =========================================================================
@@ -1431,31 +1488,64 @@
     // 🚀 ระบบการเซฟข้อมูลหลัก (Main Save Feature)
     // =========================================================================
 
-    // API: การอัปโหลดรูปแบบ Async 
-    function uploadImgToServer(base64, fileName, folderName) {
-        return new Promise((resolve, reject) => {
-            if(!base64 || !base64.startsWith("data:image")) { resolve(base64); return; } 
-            apiCall('uploadSingleImageBackend', { base64Data: base64, fileName: fileName, folderName: folderName })
-              .then(resolve).catch(reject);
-        });
+    // 📌 อัปเดต API: การอัปโหลดรูปแบบ Async (พร้อม Auto-Retry 3 ครั้ง ถ้าเน็ตหลุด)
+    async function uploadImgToServer(base64, fileName, folderName, retries = 3) {
+        if(!base64 || !base64.startsWith("data:image")) return base64; 
+        
+        for (let i = 0; i < retries; i++) {
+            try {
+                let res = await apiCall('uploadSingleImageBackend', { base64Data: base64, fileName: fileName, folderName: folderName });
+                return res;
+            } catch (err) {
+                if (i === retries - 1) throw err; // ถ้ารอบสุดท้ายยังพัง ค่อย Error
+                document.getElementById('loadingSubText').innerText = `สัญญาณขัดข้อง กำลังพยายามส่งใหม่รอบที่ ${i+1}...`;
+                await new Promise(r => setTimeout(r, 1500)); // รอ 1.5 วิ แล้วลองใหม่
+            }
+        }
     }
 
-    // API: Save Master Data
     async function handleFormSubmit() {
       var sessionStr = localStorage.getItem('cmms_user_session');
       if (!sessionStr) { openAlert("Error", "ไม่พบเซสชั่น กรุณาล็อกอินใหม่"); return; }
       var sessionToken = JSON.parse(sessionStr).token;
+      
+      var lName = document.getElementById('lineNameSelect').value;
+      if(lName === 'NEW_LINE') lName = document.getElementById('lineNameInput').value;
+      var mName = document.getElementById('machineNameSelect').value; if(mName === 'NEW_MACHINE') mName = document.getElementById('machineNameInput').value;
+      
+      // 📌 Data Validation: ป้องกันสร้างชื่อเครื่องจักรซ้ำซ้อน
+      if (document.getElementById('machineNameSelect').value === 'NEW_MACHINE') {
+          let isDup = globalMachinesData.some(m => m.machineName.toLowerCase() === mName.toLowerCase());
+          if (isDup) {
+              openAlert("ข้อมูลซ้ำซ้อน", "ชื่อเครื่องจักร <b>" + mName + "</b> มีในระบบแล้ว<br>หากต้องการแก้ไข กรุณาใช้การเลือกชื่อเครื่องจาก Dropdown แทนการสร้างใหม่ครับ");
+              return;
+          }
+      }
+
+      // 📌 Data Validation: ดักจับ Part ID ที่กรอกซ้ำกันในฟอร์มเดียวกัน
+      var partIdInputs = document.querySelectorAll('.input-partid');
+      var idList = [];
+      for (var input of partIdInputs) {
+          var val = input.value.trim();
+          if (val !== "") {
+              if (idList.includes(val)) {
+                  openAlert("ข้อมูลซ้ำซ้อน", "พบรหัสชั้นวาง (ID) <b>" + val + "</b> ถูกกรอกซ้ำกันในหลายชิ้นส่วน กรุณาตรวจสอบความถูกต้องก่อนบันทึกครับ");
+                  return;
+              }
+              idList.push(val);
+          }
+      }
+
       showLoading('กำลังเตรียมข้อมูลรูปภาพ...', 'ขั้นตอนนี้อาจใช้เวลา 1-2 นาที หากมีรูปจำนวนมาก ห้ามปิดหน้าต่างนี้');
       
       try {
-          var lName = document.getElementById('lineNameSelect').value;
-          if(lName === 'NEW_LINE') lName = document.getElementById('lineNameInput').value;
-          var mName = document.getElementById('machineNameSelect').value; if(mName === 'NEW_MACHINE') mName = document.getElementById('machineNameInput').value;
+          // 📌 ระบบ All-or-Nothing Prevention: อัปโหลดทีละภาพ แล้วฝัง URL กลับไปที่หน้าจอทันที
           showLoading('กำลังอัปโหลด...', '1/3 ภาพเครื่องจักรหลัก');
           var mImgPreview = document.getElementById('imgMachine').nextElementSibling;
           var mBase64 = await getBase64(document.getElementById('imgMachine').files[0]); 
           if(!mBase64) mBase64 = mImgPreview.getAttribute('data-existing-url') || "";
           var finalMachineImg = await uploadImgToServer(mBase64, mName + "_Main.jpg", "1_Machine_Images");
+          mImgPreview.setAttribute('data-existing-url', finalMachineImg); // เซฟ URL เผื่อเน็ตหลุด
           
           var payload = { lineName: lName, machineName: mName, plan: document.getElementById('machinePlan').value, machineType: document.getElementById('machineType').value, setupUser: document.getElementById('setupUserInput').value, machineImg: finalMachineImg, subSystems: [] };
           var subCards = document.querySelectorAll('.sub-system-card');
@@ -1469,6 +1559,7 @@
             var sBase64 = await getBase64(card.querySelector('.file-sub-img').files[0]);
             if(!sBase64) sBase64 = sImgPreview.getAttribute('data-existing-url') || "";
             var finalSubImg = await uploadImgToServer(sBase64, sName + "_Sub.jpg", "2_Sub_System_Images");
+            sImgPreview.setAttribute('data-existing-url', finalSubImg); 
             
             var subData = { subSystemName: sName, subImg: finalSubImg, partGroups: [] }; 
             var groupCards = card.querySelectorAll('.part-group-card');
@@ -1481,6 +1572,7 @@
                var gBase64 = await getBase64(gCard.querySelector('.file-group-img').files[0]); 
                if(!gBase64) gBase64 = gImgPreview.getAttribute('data-existing-url') || "";
                var finalGroupImg = await uploadImgToServer(gBase64, gName + "_Grp.jpg", "2_Sub_System_Images");
+               gImgPreview.setAttribute('data-existing-url', finalGroupImg);
 
                var groupData = { groupName: gName, groupImg: finalGroupImg, parts: [] };
                var partItems = gCard.querySelectorAll('.part-item');
@@ -1495,6 +1587,7 @@
                   var pExisting = pImgPreview.getAttribute('data-existing-url') || ""; 
                   var finalPBase64 = pBase64 ? pBase64 : pExisting;
                   var finalPartImg = await uploadImgToServer(finalPBase64, pName + "_Part.jpg", "3_Part_Exploded_Images");
+                  pImgPreview.setAttribute('data-existing-url', finalPartImg);
                   
                   groupData.parts.push({ 
                       partName: pName, partId: pItem.querySelector('.input-partid').value, partNumber: pItem.querySelector('.input-partnum').value,
