@@ -80,6 +80,7 @@
     .hover-card-success:hover { border-bottom: 5px solid #198754 !important; }
     .hover-card-warning:hover { border-bottom: 5px solid #ffc107 !important; }
 
+    /* Custom CSS สำหรับตาราง PM แบบใหม่บนมือถือ */
     @media (max-width: 768px) {
       body { font-size: 14px; }
       .navbar-brand .fs-4 { font-size: 1.15rem !important; }
@@ -91,14 +92,17 @@
       .fab-wrapper { bottom: 15px; right: 15px; gap: 10px; }
       .fab-main { width: 55px; height: 55px; font-size: 1.5rem; }
       .fab-item { width: 45px; height: 45px; font-size: 1.1rem; }
-      .table-pm .sticky-col-1 { min-width: 90px !important; max-width: 90px; left: 0 !important; white-space: normal; word-break: break-word; font-size: 0.7rem; }
-      .table-pm .sticky-col-2 { min-width: 140px !important; max-width: 140px; left: 90px !important; white-space: normal; word-break: break-word; font-size: 0.7rem; }
-      .ticket-seat { width: 28px; height: 28px; line-height: 28px; font-size: 0.75rem; border-radius: 6px; }
+      
+      /* ปรับตารางบนมือถือ */
+      .table-pm .sticky-col-1 { min-width: 120px !important; max-width: 120px; font-size: 0.8rem; padding: 0.5rem; white-space: normal; word-break: break-word; left: 0 !important;}
+      .table-pm .sticky-col-2 { min-width: 150px !important; max-width: 150px; font-size: 0.8rem; padding: 0.5rem; white-space: normal; word-break: break-word; left: 120px !important;}
+      .ticket-seat { width: 30px; height: 30px; line-height: 30px; font-size: 0.8rem; border-radius: 6px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- ================= LOADING & MODALS (SYS) ================= -->
   <div id="loadingOverlay">
     <div class="spinner-border text-primary" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 0.3rem;"></div>
     <h5 class="mt-4 fw-bold text-primary" id="loadingText" style="letter-spacing: 1px;">กำลังประมวลผล...</h5>
@@ -121,6 +125,7 @@
     </div>
   </div>
 
+  <!-- ================= AUTH MODALS ================= -->
   <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
@@ -232,6 +237,7 @@
     </div>
   </div>
 
+  <!-- ================= ACTION MODALS ================= -->
   <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content border-0 shadow-lg border-top border-4 border-warning">
@@ -266,69 +272,89 @@
     </div>
   </div>
 
-  <!-- 📌 อัปเดตตาราง PM Plan: เพิ่มช่องค้นหาด่วน (Quick Search) -->
+  <!-- ================= 📌 PM PLAN MODAL (NEW DESIGN) ================= -->
   <div class="modal fade" id="pmPlanModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content shadow-lg border-0">
+      <div class="modal-content shadow-lg border-0 bg-light">
         <div class="modal-header bg-success text-white p-3">
           <h5 class="modal-title fw-bold fs-5"><i class="bi bi-calendar3"></i> ตารางแผนบำรุงรักษา (PM Plan)</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body bg-light p-3 p-md-4">
+        <div class="modal-body p-2 p-md-4">
           
-          <div class="card shadow-sm border-0 mb-4 p-3 p-md-4 bg-white pm-filter-container">
-            <div class="row mb-3 pb-3 border-bottom">
-              <div class="col-12 col-md-8">
-                <label class="form-label text-primary"><i class="bi bi-search"></i> ค้นหาด่วน (พิมพ์ชื่อเครื่องจักร)</label>
-                <div class="input-group">
-                    <input type="text" class="form-control border-primary" id="quickMachineSearch" list="machineDataList" placeholder="พิมพ์เพื่อค้นหาเครื่องจักร หรือ Part Number ที่ต้องการ..." onchange="handleQuickSearch(this)">
-                    <button class="btn btn-outline-primary" type="button" title="สแกน QR Code (Coming Soon)"><i class="bi bi-qr-code-scan"></i></button>
+          <!-- 🔍 Smart Filter Section -->
+          <div class="card shadow-sm border-0 mb-4 p-3 pm-filter-container">
+             <div class="row g-3 align-items-end">
+                
+                <!-- Quick Filter (Plan) -->
+                <div class="col-12 col-md-5">
+                   <label class="form-label text-success fw-bold small">แผนก (Plan)</label>
+                   <div class="btn-group w-100 shadow-sm" role="group">
+                     <input type="radio" class="btn-check" name="pmPlanFilter" id="pmPlanAll" value="" checked onchange="renderLineCards()">
+                     <label class="btn btn-outline-success fw-bold" for="pmPlanAll">ทั้งหมด</label>
+                     <input type="radio" class="btn-check" name="pmPlanFilter" id="pmPlanPCL" value="PCL" onchange="renderLineCards()">
+                     <label class="btn btn-outline-success fw-bold" for="pmPlanPCL">PCL</label>
+                     <input type="radio" class="btn-check" name="pmPlanFilter" id="pmPlanCO" value="CO" onchange="-renderLineCards()">
+                     <label class="btn btn-outline-success fw-bold" for="pmPlanCO">CO</label>
+                   </div>
                 </div>
-                <datalist id="machineDataList"></datalist>
-              </div>
-            </div>
 
-            <div class="row g-3 align-items-end">
-              <div class="col-6 col-md-2">
-                <label class="form-label text-success">1. Plan</label>
-                <select class="form-select fw-bold bg-light border-success pm-plan-search" onchange="cascadePM('plan')"><option value="">- เลือก Plan -</option></select>
-              </div>
-              <div class="col-6 col-md-2">
-                <label class="form-label text-success">2. Type</label>
-                <select class="form-select fw-bold bg-light border-success pm-type-search" onchange="cascadePM('type')" disabled><option value="">- ล็อก -</option></select>
-              </div>
-              <div class="col-12 col-md-3">
-                <label class="form-label text-success">3. Line (ไลน์ผลิต)</label>
-                <select class="form-select fw-bold bg-light border-success pm-line-search" onchange="cascadePM('line')" disabled><option value="">- ล็อก -</option></select>
-              </div>
-              <div class="col-12 col-md-3">
-                <label class="form-label text-success">4. Machine (เครื่องจักร)</label>
-                <select class="form-select fw-bold bg-light border-success pm-machine-search" disabled><option value="">- ล็อก -</option></select>
-              </div>
-              <div class="col-12 col-md-2">
-                <label class="form-label d-none d-md-block"> </label>
-                <button class="btn btn-primary w-100 fw-bold shadow-sm" onclick="handlePMFilterSubmit(this)"><i class="bi bi-funnel-fill"></i> กรองข้อมูล</button>
-              </div>
-            </div>
-            
-            <div class="mt-4 text-muted small fw-bold text-center text-md-start">
-              <span class="badge bg-success me-1 fs-6 px-3">PM</span> <span class="ms-1 align-middle">= ซ่อมตามแผน</span> 
-              <span class="badge bg-danger ms-3 me-1 fs-6 px-3">BD</span> <span class="ms-1 align-middle">= เครื่องพัง</span> 
-              <span class="badge bg-warning text-dark ms-3 me-1 fs-6 px-3">P</span> <span class="ms-1 align-middle">= แผนถัดไป</span>
-            </div>
+                <!-- Dropdown (Type) -->
+                <div class="col-12 col-md-3">
+                   <label class="form-label text-success fw-bold small">ประเภท (Type)</label>
+                   <select class="form-select border-success text-success fw-bold shadow-sm" id="pmTypeFilter" onchange="renderLineCards()">
+                      <option value="">- ทุกประเภท -</option>
+                      <option value="Packing">Packing</option>
+                      <option value="Mixing">Mixing</option>
+                   </select>
+                </div>
+
+                <!-- Search Box -->
+                <div class="col-12 col-md-4">
+                   <label class="form-label text-success fw-bold small">ค้นหาเครื่องจักร</label>
+                   <div class="input-group shadow-sm">
+                      <span class="input-group-text bg-success text-white border-success"><i class="bi bi-search"></i></span>
+                      <input type="text" class="form-control border-success" id="pmSearchFilter" placeholder="พิมพ์ชื่อไลน์/เครื่อง..." oninput="renderLineCards()">
+                   </div>
+                </div>
+             </div>
+
+             <!-- Toggle Weeks View -->
+             <div class="mt-3 text-end">
+                 <button class="btn btn-sm btn-light border text-muted fw-bold" onclick="toggleWeeksView()">
+                     <i class="bi bi-calendar-range"></i> <span id="toggleWeeksText">แสดงผลเต็ม 52 สัปดาห์</span>
+                 </button>
+             </div>
           </div>
           
-          <div class="card shadow-sm border-0 p-2 p-md-3 bg-white">
-            <div id="pmTableWrapper">
-              <div class="p-5 text-center text-muted fw-bold fs-5"><i class="bi bi-inbox fs-1 d-block mb-3"></i>กรุณาค้นหา หรือกรองข้อมูลด้านบนเพื่อแสดงตาราง</div>
-            </div>
+          <!-- 🏭 Line Accordion Container (โหลดตารางมาโชว์ที่นี่) -->
+          <div id="pmLineCardsContainer" class="accordion shadow-sm rounded-3">
+              <!-- Cards will be injected via JS -->
           </div>
+
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 🔴 Modal สำหรับแสดงประวัติ BD (เพิ่มใหม่) -->
+  <!-- 🔴 🔍 MACHINE DRILL-DOWN MODAL -->
+  <div class="modal fade" id="machineDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content shadow-lg border-0 border-top border-5 border-success">
+        <div class="modal-header bg-white pb-0 border-0">
+          <h5 class="modal-title fw-bold text-success" id="machineDetailTitle"><i class="bi bi-gear-fill"></i> รายละเอียดเครื่องจักร</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body bg-light p-2 p-md-3">
+           <div id="machineDetailWrapper">
+               <!-- Table 52 Weeks goes here -->
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔴 ⚠️ BD HISTORY MODAL -->
   <div class="modal fade" id="bdHistoryModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content shadow-lg border-0 border-top border-5 border-danger">
@@ -336,17 +362,17 @@
           <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill"></i> ประวัติการเสีย (Breakdown History)</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body bg-light">
-           <div class="table-responsive bg-white shadow-sm rounded">
-              <table class="table table-hover align-middle mb-0 text-center">
+        <div class="modal-body bg-light p-2 p-md-4">
+           <div class="table-responsive bg-white shadow-sm rounded border">
+              <table class="table table-hover align-middle mb-0 text-center" style="font-size: 0.9rem;">
                 <thead class="table-danger">
                   <tr>
                      <th>Job No</th>
-                     <th>วันที่</th>
+                     <th>วันที่แจ้ง</th>
                      <th>อาการ (Breakdown)</th>
                      <th>สาเหตุ (Cause)</th>
-                     <th>การแก้ไข</th>
-                     <th>ช่างผู้รับผิดชอบ</th>
+                     <th>การแก้ไข (Action)</th>
+                     <th>ช่างรับผิดชอบ</th>
                      <th>สถานะ</th>
                   </tr>
                 </thead>
@@ -480,7 +506,8 @@
           <span class="fab-label lbl-log">ประวัติระบบ (Log)</span>
           <button class="fab-item fab-btn-log" title="ดูประวัติการใช้งาน"><i class="bi bi-clock-history"></i></button>
         </div>
-        <div class="fab-item-container" id="btnFloatingPM" data-bs-toggle="modal" data-bs-target="#pmPlanModal" onclick="toggleFab();">
+        <!-- 🔴 เปลี่ยนปุ่มเปิดตาราง PM ให้ล้างหน้าจอแบบ Accordion -->
+        <div class="fab-item-container" id="btnFloatingPM" data-bs-toggle="modal" data-bs-target="#pmPlanModal" onclick="renderLineCards(); toggleFab();">
           <span class="fab-label lbl-pm">ตาราง PM (Schedule)</span>
           <button class="fab-item fab-btn-pm" title="เปิดตารางซ่อมบำรุง"><i class="bi bi-calendar-check-fill"></i></button>
         </div>
@@ -571,7 +598,7 @@
                 </div>
              </div>
             <div class="col-12 col-md-4">
-                <div class="card shadow-sm border-0 h-100 hover-card hover-card-success" data-bs-toggle="modal" data-bs-target="#pmPlanModal">
+                <div class="card shadow-sm border-0 h-100 hover-card hover-card-success" data-bs-toggle="modal" data-bs-target="#pmPlanModal" onclick="renderLineCards();">
                     <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
                         <i class="bi bi-calendar-check text-success mb-3" style="font-size: 3rem;"></i>
                         <h5 class="fw-bold mb-2">ตารางแผนซ่อมบำรุง</h5>
@@ -767,10 +794,10 @@
     var targetActionCell = null; 
     var targetActionWeek = 0; 
     var pendingActionType = "";
-    var pmShowAllWeeks = false; 
+    var pmShowAllWeeks = false; // สลับดูแบบสั้น/ยาว
     var currentUserRole = ""; 
     window.upcomingPMData = null;
-    window.currentMachineBDHistory = []; // ตัวแปรเก็บประวัติ BD ของเครื่องที่เลือก
+    window.currentMachineBDHistory = [];
 
     document.addEventListener('show.bs.modal', function (event) {
         var zIndex = 1050 + (10 * document.querySelectorAll('.modal.show').length);
@@ -1132,7 +1159,6 @@
         .catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); });
     }
 
-    // 🔴 โชว์ประวัติ Breakdown ของเครื่องจักรนั้นๆ (BD History Modal)
     function openBDHistoryModal() {
         var tbody = document.getElementById('bdHistoryTableBody');
         tbody.innerHTML = "";
@@ -1144,9 +1170,9 @@
                 tbody.innerHTML += `<tr>
                     <td class="fw-bold text-secondary">#${job.num}</td>
                     <td>${job.date}</td>
-                    <td class="text-danger fw-bold">${job.breakdown}</td>
-                    <td class="text-muted">${job.cause || '-'}</td>
-                    <td>${job.solved || '-'}</td>
+                    <td class="text-danger fw-bold text-wrap" style="max-width:200px;">${job.breakdown}</td>
+                    <td class="text-muted text-wrap" style="max-width:150px;">${job.cause || '-'}</td>
+                    <td class="text-wrap" style="max-width:200px;">${job.solved || '-'}</td>
                     <td><span class="badge bg-light text-dark border">${job.tech || 'Unassigned'}</span></td>
                     <td>${stat}</td>
                 </tr>`;
@@ -1213,22 +1239,12 @@
       showLoading('กำลังซิงค์ข้อมูล (อาจใช้เวลาสักครู่หากฐานข้อมูลมีขนาดใหญ่)...');
       apiCall('getExistingPartsData')
         .then(function(parts) {
-          globalPartsData = parts || []; var dataList = document.getElementById('partDataList'); 
-          if(dataList) { 
-              dataList.innerHTML = ""; 
-              globalPartsData.forEach(function(p) { 
-                  if(p.partName || p.partId) { 
-                      var option = document.createElement('option'); var searchTerms = []; 
-                      if(p.partId) searchTerms.push(p.partId); if(p.partName) searchTerms.push(p.partName); if(p.partNumber || p.model) searchTerms.push(p.partNumber || p.model); 
-                      option.value = searchTerms.join(" | "); dataList.appendChild(option); 
-                  } 
-              }); 
-          }
+          globalPartsData = parts || []; 
           return apiCall('getExistingMachines');
         })
         .then(function(machinesObj) { 
             globalMachinesData = machinesObj || []; 
-            cascadeSetup('plan'); populatePMDropdowns(); updateDashboardKPIs(); 
+            cascadeSetup('plan'); updateDashboardKPIs(); 
             hideLoading(); addSubsystemCard(); setTimeout(loadDraftFromLocal, 1000); 
             fetchUpcomingDashboardData();
         })
@@ -1263,143 +1279,147 @@
     }
 
     // =========================================================================
-    // 📅 ระบบตาราง PM (PM Table Features)
+    // 📅 ระบบตาราง PM (NEW UX/UI - Accordion & Quick Filters)
     // =========================================================================
 
-    function populatePMDropdowns() { 
-        var uniquePlans = [...new Set(globalMachinesData.map(m => m.plan))].filter(Boolean);
-        var planSel = document.querySelector('.pm-plan-search'); planSel.innerHTML = '<option value="">- เลือก Plan -</option>';
-        uniquePlans.forEach(v => { var opt = document.createElement('option'); opt.value = v; opt.innerText = v; planSel.appendChild(opt); }); cascadePM('reset');
-        
-        var dList = document.getElementById('machineDataList');
-        dList.innerHTML = "";
+    function toggleWeeksView() {
+        pmShowAllWeeks = !pmShowAllWeeks;
+        document.getElementById('toggleWeeksText').innerText = pmShowAllWeeks ? "ย่อดู 6 สัปดาห์" : "แสดงผลเต็ม 52 สัปดาห์";
+        // ล้างสถานะการโหลดเพื่อบังคับให้ดึงตารางใหม่เมื่อกดเปิดไลน์
+        document.querySelectorAll('.accordion-body').forEach(el => el.removeAttribute('data-loaded'));
+        // เปิดไลน์ที่เปิดค้างไว้อยู่ (ถ้ามี)
+        renderLineCards(); 
+    }
+
+    // 🔴 1. แสดงการ์ดของแต่ละไลน์
+    function renderLineCards() {
+        var planFilter = document.querySelector('input[name="pmPlanFilter"]:checked').value;
+        var typeFilter = document.getElementById('pmTypeFilter').value;
+        var searchFilter = document.getElementById('pmSearchFilter').value.toLowerCase();
+
+        var linesObj = {};
         globalMachinesData.forEach(m => {
-           let opt = document.createElement('option');
-           opt.value = m.machineName;
-           dList.appendChild(opt);
+            if(planFilter && m.plan !== planFilter) return;
+            if(typeFilter && m.type !== typeFilter) return;
+            if(searchFilter && !(m.lineName.toLowerCase().includes(searchFilter) || m.machineName.toLowerCase().includes(searchFilter))) return;
+            
+            if(!linesObj[m.lineName]) {
+                linesObj[m.lineName] = { plan: m.plan, type: m.type, count: 0 };
+            }
+            linesObj[m.lineName].count++;
+        });
+
+        var container = document.getElementById('pmLineCardsContainer');
+        container.innerHTML = "";
+        var keys = Object.keys(linesObj).sort();
+        
+        if(keys.length === 0) {
+            container.innerHTML = `<div class="p-5 text-center text-muted fw-bold"><i class="bi bi-inbox fs-1 d-block mb-3"></i>ไม่พบข้อมูลตามเงื่อนไขที่เลือก</div>`;
+            return;
+        }
+
+        keys.forEach((line, idx) => {
+            var info = linesObj[line];
+            var badgeClass = info.plan === 'PCL' ? 'bg-primary' : 'bg-warning text-dark';
+            var html = `
+            <div class="accordion-item border-0 border-bottom mb-2 rounded shadow-sm">
+                <h2 class="accordion-header" id="heading${idx}">
+                    <button class="accordion-button collapsed fw-bold fs-6 text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${idx}" onclick="loadLineContent('${line}', 'content${idx}')">
+                        <i class="bi bi-building me-2 text-success fs-5"></i> ${line} 
+                        <span class="badge ${badgeClass} ms-2 fs-6">${info.plan}</span>
+                        <span class="badge bg-secondary ms-2">${info.type}</span>
+                        <span class="ms-auto me-2 text-muted small">${info.count} เครื่อง</span>
+                    </button>
+                </h2>
+                <div id="collapse${idx}" class="accordion-collapse collapse" data-bs-parent="#pmLineCardsContainer">
+                    <div class="accordion-body p-0 border-top" id="content${idx}">
+                        <div class="text-center py-4 text-success fw-bold"><div class="spinner-border spinner-border-sm me-2"></div>กำลังโหลดข้อมูลตาราง...</div>
+                    </div>
+                </div>
+            </div>`;
+            container.innerHTML += html;
         });
     }
-    
-    function handleQuickSearch(input) {
-        if(input.value) {
-            drillDownToMachine(input.value);
-        }
+
+    // 🔴 2. ดึงข้อมูลตารางเมื่อกดขยาย Line
+    function loadLineContent(lineName, contentId) {
+        var contentDiv = document.getElementById(contentId);
+        if(contentDiv.getAttribute('data-loaded') === 'true') return; // กันดึงซ้ำ
+
+        apiCall('getLinePMData', { lineName: lineName })
+        .then(function(res) {
+            if(!res.success) { contentDiv.innerHTML = `<div class="text-danger p-3 fw-bold">${res.message}</div>`; return; }
+            contentDiv.setAttribute('data-loaded', 'true');
+            renderLineTableInside(res.data, lineName, contentDiv);
+        })
+        .catch(function(err) { contentDiv.innerHTML = `<div class="text-danger p-3 fw-bold">${err.message}</div>`; });
     }
 
-    function cascadePM(step) {
-        var planSel = document.querySelector('.pm-plan-search');
-        var typeSel = document.querySelector('.pm-type-search'); var lineSel = document.querySelector('.pm-line-search'); var machSel = document.querySelector('.pm-machine-search');
-        
-        if (step === 'reset') { typeSel.disabled = true;
-        typeSel.innerHTML = '<option value="">- ล็อก -</option>'; lineSel.disabled = true; lineSel.innerHTML = '<option value="">- ล็อก -</option>'; machSel.disabled = true;
-        machSel.innerHTML = '<option value="">- ล็อก -</option>'; return; }
-        
-        if (step === 'plan') { if (planSel.value) { typeSel.disabled = false;
-        var validTypes = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value).map(m => m.type))].filter(Boolean); typeSel.innerHTML = '<option value="">- เลือก Type -</option>';
-        validTypes.forEach(v => typeSel.add(new Option(v, v))); } else { typeSel.disabled = true; typeSel.innerHTML = '<option value="">- ล็อก -</option>';
-        } step = 'type'; }
-        
-        if (step === 'type') { if (typeSel.value && planSel.value) { lineSel.disabled = false;
-        var validLines = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value && m.type === typeSel.value).map(m => m.lineName))].filter(Boolean);
-        lineSel.innerHTML = '<option value="">- เลือก Line -</option>'; validLines.forEach(v => lineSel.add(new Option(v, v))); } else { lineSel.disabled = true;
-        lineSel.innerHTML = '<option value="">- ล็อก -</option>'; } step = 'line';
-        }
-        
-        if (step === 'line') { if (lineSel.value) { machSel.disabled = false;
-        var validMachines = [...new Set(globalMachinesData.filter(m => m.plan === planSel.value && m.type === typeSel.value && m.lineName === lineSel.value).map(m => m.machineName))].filter(Boolean);
-        machSel.innerHTML = '<option value="">-- ดูภาพรวมทุกเครื่องในไลน์ --</option>'; validMachines.forEach(v => machSel.add(new Option(v, v))); } else { machSel.disabled = true;
-        machSel.innerHTML = '<option value="">- ล็อก -</option>'; } }
-    }
-
-    function handlePMFilterSubmit(btn) { var container = btn.closest('.pm-filter-container');
-        var lineVal = container.querySelector('.pm-line-search').value; var machVal = container.querySelector('.pm-machine-search').value; if (machVal) { currentMachinePM = machVal; loadPMPlan(null);
-        } else if (lineVal) { loadLinePMOverview(container); } else { openAlert("แจ้งเตือน", "กรุณาเลือก <b>'ไลน์ผลิต (Line)'</b> ก่อนดึงข้อมูล");
-        } 
-    }
-    
-    function loadLinePMOverview(containerOrBtn) {
-      var container = containerOrBtn.classList ? containerOrBtn.closest('.pm-filter-container') : containerOrBtn; var lineName = container.querySelector('.pm-line-search').value; showLoading('กำลังประมวลผลแผน PM ทั้งไลน์...');
-      apiCall('getLinePMData', { lineName: lineName })
-      .then(function(res) { 
-          hideLoading(); 
-          if(!res || !res.success) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-danger fw-bold"><i class="bi bi-exclamation-triangle fs-1 d-block mb-3"></i>${res ? res.message : "ดึงข้อมูลไม่สำเร็จ"}</div>`; return; } 
-          var data = res.data; if(!data || data.length === 0) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-warning fw-bold"><i class="bi bi-inbox fs-1 d-block mb-3"></i>ไม่พบแผนบำรุงรักษาในไลน์ผลิตนี้</div>`; return; } 
-          renderLineOverviewTable(data, lineName); 
-      }).catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); });
-    }
-
-    function renderLineOverviewTable(machinesData, lineName) {
+    // 🔴 3. วาดตารางฝังเข้าไปในการ์ดของไลน์
+    function renderLineTableInside(machinesData, lineName, containerDiv) {
       var currentWeek = getWeekNumber(new Date());
-      var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 1); var endW = pmShowAllWeeks ?
-      52 : Math.min(52, currentWeek + 6); 
+      var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 1); 
+      var endW = pmShowAllWeeks ? 52 : Math.min(52, currentWeek + 4); 
       
-      var exportBtn = `<button class="btn btn-sm btn-outline-success fw-bold ms-2" onclick="exportTableToCSV('PM_Plan_Line_${lineName}.csv')"><i class="bi bi-file-earmark-excel"></i> Export CSV</button>`;
-      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-light p-3 rounded shadow-sm border-start border-5 border-primary"><span class="text-primary fw-bold fs-5"><i class="bi bi-building"></i> แผนซ่อมบำรุงรวม: ${lineName}</span><div><button class="btn btn-sm btn-outline-primary fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadLinePMOverview(document.querySelector('.pm-filter-container'));"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ? "ย่อดูแผนรายเดือน" : "แสดงเต็มปี"}</button>${exportBtn}</div></div>`;
-      
-      var html = toggleBtn + `<div class="table-pm-container"><table class="table table-pm mb-0 table-hover"><thead><tr><th class="sticky-col-1" style="min-width: 250px; background: #0d6efd;">เครื่องจักรในไลน์ (Machine)</th><th class="bg-primary text-white">ชิ้นส่วนที่ต้องดูแล</th>`;
-      for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-warning text-dark fs-5' : 'bg-primary text-white'}">W${w}</th>`;
-      } html += `</tr></thead><tbody>`;
+      var html = `<div class="table-pm-container border-0 rounded-bottom" style="max-height: 50vh;"><table class="table table-pm mb-0 table-hover"><thead><tr><th class="sticky-col-1" style="min-width: 200px; background: #0d6efd;">เครื่องจักร (Machine)</th><th class="bg-primary text-white">ชิ้นส่วนที่ทำ PM</th>`;
+      for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-warning text-dark fs-6' : 'bg-primary text-white'}">W${w}</th>`; } 
+      html += `</tr></thead><tbody>`;
       
       machinesData.forEach(mach => {
         var machineWeeks = {}; for(var w=1; w<=52; w++) machineWeeks[w] = { hasPlan: false, pmCount: 0, bdCount: 0 }; var pmPartsCount = 0;
         mach.parts.forEach(p => { if(!p.pmFrequency) return; pmPartsCount++; var freqNum = extractWeeks(p.pmFrequency); var historyMap = p.pmHistory || {}; var historyWeeks = Object.keys(historyMap).map(Number); var rawDate = parseEuroToDateInput(p.lastPMDate); var planWeeks = calculatePlannedWeeks(historyWeeks, freqNum, rawDate); planWeeks.forEach(w => { if(w<=52) machineWeeks[w].hasPlan = true; }); for(var w in historyMap) { if(historyMap[w] === 'PM') machineWeeks[w].pmCount++; if(historyMap[w] === 'BD') machineWeeks[w].bdCount++; } });
      
-        // 🔴 โชว์ป้ายกำกับจำนวน BD ที่ดึงมาจาก Report Database
-        var bdBadge = mach.bdCount > 0 ? `<span class="badge bg-danger ms-2 rounded-pill shadow-sm" title="พบประวัติเสีย ${mach.bdCount} ครั้งในระบบ Report">${mach.bdCount} BD</span>` : '';
+        var bdBadge = mach.bdCount > 0 ? `<span class="badge bg-danger ms-2 rounded-pill shadow-sm" title="มีประวัติเสีย ${mach.bdCount} ครั้งในระบบ">${mach.bdCount} BD</span>` : '';
 
-        html += `<tr><td class="sticky-col-1 text-start fw-bold text-dark border-end-0 bg-white"><button class="btn btn-outline-primary w-100 text-start fw-bold shadow-sm d-flex justify-content-between align-items-center" onclick="drillDownToMachine('${mach.machineName}')" title="คลิกเพื่อเจาะลึกดูรายการอะไหล่"><span><i class="bi bi-cpu-fill me-2"></i>${mach.machineName} ${bdBadge}</span><i class="bi bi-search small"></i></button></td><td class="fw-bold text-muted bg-light">${pmPartsCount} รายการ</td>`;
+        html += `<tr><td class="sticky-col-1 text-start fw-bold text-dark border-end-0 bg-white"><button class="btn btn-outline-primary w-100 text-start fw-bold shadow-sm d-flex justify-content-between align-items-center p-2" onclick="drillDownToMachine('${mach.machineName}')" title="เจาะลึกดูรายการอะไหล่"><span><i class="bi bi-cpu-fill me-2"></i>${mach.machineName}</span><div>${bdBadge}<i class="bi bi-box-arrow-in-right ms-2 text-primary"></i></div></button></td><td class="fw-bold text-muted bg-light">${pmPartsCount}</td>`;
         for(var w = startW; w <= endW; w++) {
             var cellData = machineWeeks[w];
             var displayHtml = "<span class='text-black-50 opacity-25'>-</span>"; var bgClass = "";
-            if (cellData.bdCount > 0) { displayHtml = `<span class="badge bg-danger shadow-sm"><i class="bi bi-exclamation-triangle"></i> เสีย (${cellData.bdCount})</span>`; bgClass = "bg-danger bg-opacity-10";
-            } 
-            else if (cellData.pmCount > 0) { displayHtml = `<span class="badge bg-success shadow-sm"><i class="bi bi-check-circle"></i> ทำแล้ว</span>`;
-            bgClass = "bg-success bg-opacity-10"; } 
-            else if (cellData.hasPlan) { displayHtml = `<div class="ticket-seat seat-plan mx-auto shadow-sm" title="มีแผนซ่อมบำรุง">P</div>`;
-            bgClass = "bg-warning bg-opacity-10 border-start border-end border-warning"; }
+            if (cellData.bdCount > 0) { displayHtml = `<span class="badge bg-danger shadow-sm"><i class="bi bi-exclamation-triangle"></i> (${cellData.bdCount})</span>`; bgClass = "bg-danger bg-opacity-10"; } 
+            else if (cellData.pmCount > 0) { displayHtml = `<span class="badge bg-success shadow-sm"><i class="bi bi-check-circle"></i></span>`; bgClass = "bg-success bg-opacity-10"; } 
+            else if (cellData.hasPlan) { displayHtml = `<div class="ticket-seat seat-plan mx-auto shadow-sm">P</div>`; bgClass = "bg-warning bg-opacity-10 border-start border-end border-warning"; }
             html += `<td class="text-center align-middle ${bgClass} ${w === currentWeek ? 'border border-primary border-2' : ''}">${displayHtml}</td>`;
         } html += `</tr>`;
-      }); html += `</tbody></table></div>`; document.getElementById('pmTableWrapper').innerHTML = html;
+      }); html += `</tbody></table></div>`; 
+      containerDiv.innerHTML = html;
     }
 
-    function drillDownToMachine(machineName) { var selectEl = document.querySelector('.pm-machine-search'); var optExists = Array.from(selectEl.options).some(opt => opt.value === machineName);
-        if(!optExists) { var opt = document.createElement('option'); opt.value = machineName; opt.innerText = machineName; selectEl.appendChild(opt); } selectEl.value = machineName; currentMachinePM = machineName;
-        loadPMPlan(null); 
-    }
-
-    function loadPMPlan(btn) {
-      if (btn) { var container = btn.closest('.pm-filter-container'); currentMachinePM = container.querySelector('.pm-machine-search').value; }
-      var mName = currentMachinePM; if(!mName) { openAlert("แจ้งเตือน", "ระบบไม่พบชื่อเครื่องจักรเป้าหมาย"); return; }
-      showLoading('กำลังเจาะลึกตารางอะไหล่...');
-      
-      apiCall('getMachineStructureDetails', { machineName: mName })
-      .then(function(res) {
-        hideLoading(); 
-        if(!res || !res.success) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-danger fw-bold"><i class="bi bi-exclamation-triangle fs-1 d-block mb-3"></i>${res ? res.message : "ดึงข้อมูลไม่สำเร็จ"}</div>`; return; }
-        var data = res.data; if(!data || !data.subSystems || data.subSystems.length === 0) { document.getElementById('pmTableWrapper').innerHTML = `<div class="p-4 text-center text-warning fw-bold"><i class="bi bi-inbox fs-1 d-block mb-3"></i>ไม่พบข้อมูลในเครื่องจักรนี้</div>`; return; } 
+    // 🔴 4. โหลดข้อมูลเครื่องจักรที่เลือกใส่ Modal เจาะลึก
+    function drillDownToMachine(machineName) { 
+        currentMachinePM = machineName;
+        document.getElementById('machineDetailTitle').innerHTML = `<i class="bi bi-gear-fill"></i> แผนบำรุงรักษา: ${machineName}`;
+        var wrapper = document.getElementById('machineDetailWrapper');
+        wrapper.innerHTML = `<div class="p-5 text-center text-success fw-bold"><div class="spinner-border me-2"></div>กำลังดึงข้อมูล...</div>`;
         
-        // 🔴 ส่งต่อประวัติ BD ให้หน้าต่างย่อย (Modal)
-        window.currentMachineBDHistory = data.bdHistory || [];
-        render52WeekTable(data.subSystems);
-        
-      }).catch(function(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); });
+        // เปิด Modal ซ้อน
+        new bootstrap.Modal(document.getElementById('machineDetailModal')).show();
+
+        apiCall('getMachineStructureDetails', { machineName: machineName })
+        .then(function(res) {
+            if(!res || !res.success) { wrapper.innerHTML = `<div class="p-4 text-center text-danger fw-bold"><i class="bi bi-exclamation-triangle fs-1 d-block mb-3"></i>${res ? res.message : "ดึงข้อมูลไม่สำเร็จ"}</div>`; return; }
+            var data = res.data; 
+            if(!data || !data.subSystems || data.subSystems.length === 0) { wrapper.innerHTML = `<div class="p-4 text-center text-warning fw-bold"><i class="bi bi-inbox fs-1 d-block mb-3"></i>ไม่พบโครงสร้างอะไหล่</div>`; return; } 
+            
+            window.currentMachineBDHistory = data.bdHistory || [];
+            render52WeekTableInsideModal(data.subSystems, wrapper);
+        })
+        .catch(function(err) { wrapper.innerHTML = `<div class="p-4 text-center text-danger fw-bold">${err.message}</div>`; });
     }
 
-    function render52WeekTable(subSystems) {
+    function render52WeekTableInsideModal(subSystems, wrapper) {
       var currentWeek = getWeekNumber(new Date());
-      var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 2); var endW = pmShowAllWeeks ?
-      52 : Math.min(52, currentWeek + 2);
+      var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 1); 
+      var endW = pmShowAllWeeks ? 52 : Math.min(52, currentWeek + 4);
       
-      // 🔴 เพิ่มปุ่มดูประวัติเครื่องพัง (BD History)
       var bdCount = window.currentMachineBDHistory ? window.currentMachineBDHistory.length : 0;
-      var bdBtn = `<button class="btn btn-sm btn-danger fw-bold ms-2 shadow-sm" onclick="openBDHistoryModal()"><i class="bi bi-exclamation-triangle"></i> ประวัติ BD (${bdCount})</button>`;
+      var bdBtn = `<button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="openBDHistoryModal()"><i class="bi bi-exclamation-triangle"></i> ประวัติ BD (${bdCount})</button>`;
+      var exportBtn = `<button class="btn btn-sm btn-outline-success fw-bold ms-2" onclick="exportTableToCSV('PM_Machine_${currentMachinePM}.csv')"><i class="bi bi-file-earmark-excel"></i> CSV</button>`;
       
-      var exportBtn = `<button class="btn btn-sm btn-outline-success fw-bold ms-2" onclick="exportTableToCSV('PM_Plan_Machine_${currentMachinePM}.csv')"><i class="bi bi-file-earmark-excel"></i> Export CSV</button>`;
-      var toggleBtn = `<div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm border border-success border-start-0 border-end-0 border-top-0 border-bottom-5"><span class="text-success fw-bold ms-2 fs-5"><i class="bi bi-gear"></i> รายการอะไหล่: ${currentMachinePM} (ปัจจุบัน W${currentWeek})</span><div><button class="btn btn-sm btn-outline-success fw-bold" onclick="pmShowAllWeeks = !pmShowAllWeeks; loadPMPlan(null);"><i class="bi bi-arrows-expand"></i> ${pmShowAllWeeks ? "ย่อดู 5 สัปดาห์" : "แสดงเต็มปี"}</button>${bdBtn}${exportBtn}</div></div>`;
+      var topBar = `<div class="d-flex justify-content-between mb-3">${bdBtn} ${exportBtn}</div>`;
       
-      var html = toggleBtn + `<div class="table-pm-container"><table class="table table-pm mb-0"><thead><tr><th class="sticky-col-1">ระบบ ➔ กลุ่ม</th><th class="sticky-col-2">รายละเอียดชิ้นส่วน (Part Details)</th>`;
-      for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-success text-white fs-5' : ''}">W${w}</th>`;
-      } html += `</tr></thead><tbody>`;
+      var html = topBar + `<div class="table-pm-container"><table class="table table-pm mb-0"><thead><tr><th class="sticky-col-1">ระบบ ➔ กลุ่ม</th><th class="sticky-col-2">รายละเอียดชิ้นส่วน (Part Details)</th>`;
+      for(var w = startW; w <= endW; w++) { html += `<th class="${w === currentWeek ? 'bg-success text-white fs-6' : ''}">W${w}</th>`; } 
+      html += `</tr></thead><tbody>`;
       
       subSystems.forEach(sub => {
         sub.partGroups.forEach(group => {
@@ -1408,24 +1428,22 @@
             
             var groupNameHtml = ''; if (pIdx === 0) { 
               groupNameHtml = `<td class="sticky-col-1 bg-light align-middle border-end-0" rowspan="${group.parts.length}"><div class="fw-bold text-dark fs-6 text-wrap lh-sm mb-1">${sub.subSystemName}</div><div class="text-success fw-bold text-wrap lh-sm" style="font-size:0.75rem;"><i class="bi bi-arrow-return-right"></i> ${group.groupName}</div></td>`; } else { groupNameHtml = `<td class="sticky-col-1 d-none"></td>`; }
-            var classBg = p.classification === 'A' ? 'bg-danger' : (p.classification === 'B' ?
-            'bg-warning text-dark' : 'bg-success');
-            html += `<tr data-partname="${p.partName}" data-freq="${freqNum}" data-lastpm="${rawDate || ''}">${groupNameHtml}<td class="sticky-col-2 border-start-0"><div class="fw-bold text-dark text-wrap fs-6 mb-1">${p.partName}</div><div class="text-muted mb-2" style="font-size:0.75rem;">P/N: ${p.partNumber ||
-            '-'} | ID: ${p.partId || '-'}</div><div class="d-flex flex-wrap gap-1" style="font-size:0.75rem;"><span class="badge bg-light text-dark border"><i class="bi bi-gear"></i> Std: ${p.pmStandard ||
-            '-'}</span><span class="badge ${classBg}">Class ${p.classification || '-'}</span><span class="badge bg-danger text-white"><i class="bi bi-calendar-week"></i> Freq: ${p.pmFrequency}</span></div></td>`;
+            var classBg = p.classification === 'A' ? 'bg-danger' : (p.classification === 'B' ? 'bg-warning text-dark' : 'bg-success');
+            html += `<tr data-partname="${p.partName}" data-freq="${freqNum}" data-lastpm="${rawDate || ''}">${groupNameHtml}<td class="sticky-col-2 border-start-0"><div class="fw-bold text-dark text-wrap fs-6 mb-1">${p.partName}</div><div class="text-muted mb-2" style="font-size:0.75rem;">P/N: ${p.partNumber || '-'} | ID: ${p.partId || '-'}</div><div class="d-flex flex-wrap gap-1" style="font-size:0.75rem;"><span class="badge bg-light text-dark border"><i class="bi bi-gear"></i> Std: ${p.pmStandard || '-'}</span><span class="badge ${classBg}">Class ${p.classification || '-'}</span><span class="badge bg-danger text-white"><i class="bi bi-calendar-week"></i> Freq: ${p.pmFrequency}</span></div></td>`;
+            
             for(var w = startW; w <= endW; w++) {
               var recordedType = historyMap[w];
               var isPlan = planWeeks.includes(w); var cssClass = "ticket-seat"; var displayChar = "-";
               
-              if(recordedType === "PM") { cssClass += " seat-pm";
-              displayChar = "PM"; } else if(recordedType === "BD") { cssClass += " seat-bd"; displayChar = "BD";
-              } else if(isPlan) { cssClass += " seat-plan"; displayChar = "P";
-              }
+              if(recordedType === "PM") { cssClass += " seat-pm"; displayChar = "PM"; } 
+              else if(recordedType === "BD") { cssClass += " seat-bd"; displayChar = "BD"; } 
+              else if(isPlan) { cssClass += " seat-plan"; displayChar = "P"; }
               html += `<td class="text-center ${w === currentWeek ? 'bg-warning bg-opacity-10' : ''}"><div class="${cssClass}" onclick="openActionModal(this, ${w})">${displayChar}</div></td>`;
             } html += `</tr>`;
           });
         });
-      }); html += `</tbody></table></div>`; document.getElementById('pmTableWrapper').innerHTML = html;
+      }); html += `</tbody></table></div>`; 
+      wrapper.innerHTML = html;
     }
 
     function calculatePlannedWeeks(historyArr, interval, lastPMDateStr) {
@@ -1459,15 +1477,22 @@
       apiCall('updatePMWeekAction', { machineName: currentMachinePM, partName: partName, weekNum: w, typeValue: pendingActionType, token: sessionToken })
          .then(function(res) { 
              hideLoading(); 
-             if(res.success) { loadPMPlan(null); } else { openAlert("ปฏิเสธการเข้าถึง", res.message); }
+             if(res.success) { 
+                 // รีโหลดหน้าเจาะลึกเครื่องจักร
+                 drillDownToMachine(currentMachinePM); 
+                 // สั่งให้หน้า Line Overview ต้องโหลดใหม่เมื่อถูกเปิด
+                 document.querySelectorAll('.accordion-body').forEach(el => el.removeAttribute('data-loaded'));
+             } else { openAlert("ปฏิเสธการเข้าถึง", res.message); }
          }).catch(function(e) { hideLoading(); openAlert("Error", "บันทึกไม่ได้: " + e.message); });
     }
 
     function exportTableToCSV(filename) {
         var csv = [];
-        var rows = document.querySelectorAll(".table-pm-container table tr");
-        if (rows.length === 0) { openAlert("แจ้งเตือน", "ไม่มีข้อมูลสำหรับ Export"); return; }
+        // ค้นหาตารางที่กำลังแสดงผลอยู่
+        var visibleTable = document.querySelector(".modal.show .table-pm-container table");
+        if (!visibleTable) { openAlert("แจ้งเตือน", "ไม่มีข้อมูลสำหรับ Export"); return; }
         
+        var rows = visibleTable.querySelectorAll("tr");
         for (var i = 0; i < rows.length; i++) {
             var row = [], cols = rows[i].querySelectorAll("td, th");
             for (var j = 0; j < cols.length; j++) {
