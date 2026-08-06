@@ -80,7 +80,6 @@
     .hover-card-success:hover { border-bottom: 5px solid #198754 !important; }
     .hover-card-warning:hover { border-bottom: 5px solid #ffc107 !important; }
 
-    /* Custom CSS สำหรับตาราง PM แบบใหม่บนมือถือ */
     @media (max-width: 768px) {
       body { font-size: 14px; }
       .navbar-brand .fs-4 { font-size: 1.15rem !important; }
@@ -93,7 +92,6 @@
       .fab-main { width: 55px; height: 55px; font-size: 1.5rem; }
       .fab-item { width: 45px; height: 45px; font-size: 1.1rem; }
       
-      /* ปรับตารางบนมือถือ */
       .table-pm .sticky-col-1 { min-width: 120px !important; max-width: 120px; font-size: 0.8rem; padding: 0.5rem; white-space: normal; word-break: break-word; left: 0 !important;}
       .table-pm .sticky-col-2 { min-width: 150px !important; max-width: 150px; font-size: 0.8rem; padding: 0.5rem; white-space: normal; word-break: break-word; left: 120px !important;}
       .ticket-seat { width: 30px; height: 30px; line-height: 30px; font-size: 0.8rem; border-radius: 6px; }
@@ -285,8 +283,6 @@
           <!-- 🔍 Smart Filter Section -->
           <div class="card shadow-sm border-0 mb-4 p-3 pm-filter-container">
              <div class="row g-3 align-items-end">
-                
-                <!-- Quick Filter (Plan) -->
                 <div class="col-12 col-md-5">
                    <label class="form-label text-success fw-bold small">แผนก (Plan)</label>
                    <div class="btn-group w-100 shadow-sm" role="group">
@@ -294,12 +290,11 @@
                      <label class="btn btn-outline-success fw-bold" for="pmPlanAll">ทั้งหมด</label>
                      <input type="radio" class="btn-check" name="pmPlanFilter" id="pmPlanPCL" value="PCL" onchange="renderLineCards()">
                      <label class="btn btn-outline-success fw-bold" for="pmPlanPCL">PCL</label>
-                     <input type="radio" class="btn-check" name="pmPlanFilter" id="pmPlanCO" value="CO" onchange="-renderLineCards()">
+                     <input type="radio" class="btn-check" name="pmPlanFilter" id="pmPlanCO" value="CO" onchange="renderLineCards()">
                      <label class="btn btn-outline-success fw-bold" for="pmPlanCO">CO</label>
                    </div>
                 </div>
 
-                <!-- Dropdown (Type) -->
                 <div class="col-12 col-md-3">
                    <label class="form-label text-success fw-bold small">ประเภท (Type)</label>
                    <select class="form-select border-success text-success fw-bold shadow-sm" id="pmTypeFilter" onchange="renderLineCards()">
@@ -309,7 +304,6 @@
                    </select>
                 </div>
 
-                <!-- Search Box -->
                 <div class="col-12 col-md-4">
                    <label class="form-label text-success fw-bold small">ค้นหาเครื่องจักร</label>
                    <div class="input-group shadow-sm">
@@ -319,7 +313,6 @@
                 </div>
              </div>
 
-             <!-- Toggle Weeks View -->
              <div class="mt-3 text-end">
                  <button class="btn btn-sm btn-light border text-muted fw-bold" onclick="toggleWeeksView()">
                      <i class="bi bi-calendar-range"></i> <span id="toggleWeeksText">แสดงผลเต็ม 52 สัปดาห์</span>
@@ -327,11 +320,9 @@
              </div>
           </div>
           
-          <!-- 🏭 Line Accordion Container (โหลดตารางมาโชว์ที่นี่) -->
           <div id="pmLineCardsContainer" class="accordion shadow-sm rounded-3">
               <!-- Cards will be injected via JS -->
           </div>
-
         </div>
       </div>
     </div>
@@ -346,9 +337,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body bg-light p-2 p-md-3">
-           <div id="machineDetailWrapper">
-               <!-- Table 52 Weeks goes here -->
-           </div>
+           <div id="machineDetailWrapper"></div>
         </div>
       </div>
     </div>
@@ -506,7 +495,6 @@
           <span class="fab-label lbl-log">ประวัติระบบ (Log)</span>
           <button class="fab-item fab-btn-log" title="ดูประวัติการใช้งาน"><i class="bi bi-clock-history"></i></button>
         </div>
-        <!-- 🔴 เปลี่ยนปุ่มเปิดตาราง PM ให้ล้างหน้าจอแบบ Accordion -->
         <div class="fab-item-container" id="btnFloatingPM" data-bs-toggle="modal" data-bs-target="#pmPlanModal" onclick="renderLineCards(); toggleFab();">
           <span class="fab-label lbl-pm">ตาราง PM (Schedule)</span>
           <button class="fab-item fab-btn-pm" title="เปิดตารางซ่อมบำรุง"><i class="bi bi-calendar-check-fill"></i></button>
@@ -535,7 +523,7 @@
             <i class="bi bi-person-circle text-warning fs-6 align-middle me-1"></i> 
             <span id="displayUserName" class="user-name-text">User</span>
           </span>
-          <button class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; border-width: 2px;" onclick="logout()" title="ออกจากระบบ">
+          <button class="btn btn-outline-light rounded-circle p-0 d-flex align-items-center justify-content-center ms-3" style="width: 28px; height: 28px; border-width: 2px;" onclick="logout()" title="ออกจากระบบ">
             <i class="bi bi-power" style="font-size: 0.9rem; font-weight: bold;"></i>
           </button>
         </div>
@@ -556,7 +544,12 @@
                      <h4 class="fw-bold text-info mb-0" style="letter-spacing: 1px;">Week <span id="currentWeekBadge">--</span></h4>
                  </div>
              </div>
-             <div>
+             
+             <!-- 🔴 ปุ่ม Archive โฉมใหม่ (แสดงเฉพาะ Admin/Manager) -->
+             <div class="d-flex align-items-center flex-wrap gap-2 mt-2 mt-md-0">
+                 <button class="btn btn-outline-danger fw-bold rounded-pill shadow-sm px-3 py-2 d-none" id="btnArchiveYearly" onclick="triggerYearlyArchive()">
+                    <i class="bi bi-archive-fill"></i> จัดเก็บประวัติปีนี้
+                 </button>
                  <a href="https://engpcl2530-uni.github.io/BPC-Background-system-Unilever/" class="btn btn-dark fw-bold rounded-pill shadow-sm px-4 py-2">
                     <i class="bi bi-house-door-fill me-1"></i> กลับหน้า Hub ระบบ
                  </a>
@@ -794,7 +787,7 @@
     var targetActionCell = null; 
     var targetActionWeek = 0; 
     var pendingActionType = "";
-    var pmShowAllWeeks = false; // สลับดูแบบสั้น/ยาว
+    var pmShowAllWeeks = false; 
     var currentUserRole = ""; 
     window.upcomingPMData = null;
     window.currentMachineBDHistory = [];
@@ -935,10 +928,12 @@
               if(role === '3' || role === '4') {
                   document.getElementById('btnHistoryLog').classList.remove('d-none');
                   document.getElementById('btnManageUsers').classList.remove('d-none');
+                  document.getElementById('btnArchiveYearly').classList.remove('d-none'); // 🔴 โชว์ปุ่ม Archive
                   switchView('dashboard');
               } else {
                   document.getElementById('btnHistoryLog').classList.add('d-none');
                   document.getElementById('btnManageUsers').classList.add('d-none');
+                  document.getElementById('btnArchiveYearly').classList.add('d-none');
                   switchView('setup');
               }
               if (typeof loadInitialData === "function") loadInitialData();
@@ -1054,6 +1049,25 @@
             else { openAlert("Error", res.message); }
         })
         .catch(function(e) { hideLoading(); openAlert("Error", e.message); });
+    }
+
+    // 🔴 กดปุ่ม Archive (จัดเก็บรายปี)
+    function triggerYearlyArchive() {
+        openConfirm("ยืนยันการจัดเก็บประวัติ", "ระบบจะทำการคัดลอกประวัติการทำ PM/BD ทั้งหมดของปีนี้ไปเก็บในแฟ้ม Archive <br>และ<b>จะล้างเฉพาะเครื่องหมาย PM/BD</b> ออกจากตารางเพื่อเตรียมรับปีใหม่ <br><span class='text-success'>(แผนการล่วงหน้าที่จองไว้จะไม่ถูกลบ)</span><br><br><b class='text-danger'>ดำเนินการต่อหรือไม่?</b>", function() {
+            var sessionStr = localStorage.getItem('cmms_user_session');
+            var sessionToken = sessionStr ? JSON.parse(sessionStr).token : "";
+            
+            showLoading("กำลังจัดเก็บข้อมูล...", "กระบวนการนี้อาจใช้เวลา 1-2 นาที กรุณารอสักครู่...");
+            apiCall('manualYearlyArchive', { token: sessionToken })
+            .then(function(res) {
+                hideLoading();
+                if(res.success) {
+                    openAlert("สำเร็จ", "<i class='bi bi-check-circle-fill text-success fs-1 d-block mb-3 text-center'></i><div class='text-center'>" + res.message + "</div>");
+                } else {
+                    openAlert("เกิดข้อผิดพลาด", res.message);
+                }
+            }).catch(function(err) { hideLoading(); openAlert("Error", err.message); });
+        });
     }
 
     // =========================================================================
@@ -1195,6 +1209,7 @@
          localStorage.removeItem('cmms_user_session'); document.getElementById('loginSection').style.display = 'flex'; document.getElementById('mainAppSection').style.display = 'none'; document.getElementById('floatingMenu').style.display = 'none'; 
          var fab = document.getElementById('floatingMenu'); if(fab.classList.contains('active')) toggleFab();
          document.getElementById('btnHistoryLog').classList.add('d-none'); document.getElementById('btnManageUsers').classList.add('d-none'); document.getElementById('btnDashboard').classList.add('d-none');
+         document.getElementById('btnArchiveYearly').classList.add('d-none');
          document.getElementById('loginForm').reset(); currentUserRole = ""; resetAppUI();
       });
     }
@@ -1285,13 +1300,10 @@
     function toggleWeeksView() {
         pmShowAllWeeks = !pmShowAllWeeks;
         document.getElementById('toggleWeeksText').innerText = pmShowAllWeeks ? "ย่อดู 6 สัปดาห์" : "แสดงผลเต็ม 52 สัปดาห์";
-        // ล้างสถานะการโหลดเพื่อบังคับให้ดึงตารางใหม่เมื่อกดเปิดไลน์
         document.querySelectorAll('.accordion-body').forEach(el => el.removeAttribute('data-loaded'));
-        // เปิดไลน์ที่เปิดค้างไว้อยู่ (ถ้ามี)
         renderLineCards(); 
     }
 
-    // 🔴 1. แสดงการ์ดของแต่ละไลน์
     function renderLineCards() {
         var planFilter = document.querySelector('input[name="pmPlanFilter"]:checked').value;
         var typeFilter = document.getElementById('pmTypeFilter').value;
@@ -1341,10 +1353,9 @@
         });
     }
 
-    // 🔴 2. ดึงข้อมูลตารางเมื่อกดขยาย Line
     function loadLineContent(lineName, contentId) {
         var contentDiv = document.getElementById(contentId);
-        if(contentDiv.getAttribute('data-loaded') === 'true') return; // กันดึงซ้ำ
+        if(contentDiv.getAttribute('data-loaded') === 'true') return;
 
         apiCall('getLinePMData', { lineName: lineName })
         .then(function(res) {
@@ -1355,7 +1366,6 @@
         .catch(function(err) { contentDiv.innerHTML = `<div class="text-danger p-3 fw-bold">${err.message}</div>`; });
     }
 
-    // 🔴 3. วาดตารางฝังเข้าไปในการ์ดของไลน์
     function renderLineTableInside(machinesData, lineName, containerDiv) {
       var currentWeek = getWeekNumber(new Date());
       var startW = pmShowAllWeeks ? 1 : Math.max(1, currentWeek - 1); 
@@ -1384,14 +1394,12 @@
       containerDiv.innerHTML = html;
     }
 
-    // 🔴 4. โหลดข้อมูลเครื่องจักรที่เลือกใส่ Modal เจาะลึก
     function drillDownToMachine(machineName) { 
         currentMachinePM = machineName;
         document.getElementById('machineDetailTitle').innerHTML = `<i class="bi bi-gear-fill"></i> แผนบำรุงรักษา: ${machineName}`;
         var wrapper = document.getElementById('machineDetailWrapper');
         wrapper.innerHTML = `<div class="p-5 text-center text-success fw-bold"><div class="spinner-border me-2"></div>กำลังดึงข้อมูล...</div>`;
         
-        // เปิด Modal ซ้อน
         new bootstrap.Modal(document.getElementById('machineDetailModal')).show();
 
         apiCall('getMachineStructureDetails', { machineName: machineName })
@@ -1429,7 +1437,9 @@
             var groupNameHtml = ''; if (pIdx === 0) { 
               groupNameHtml = `<td class="sticky-col-1 bg-light align-middle border-end-0" rowspan="${group.parts.length}"><div class="fw-bold text-dark fs-6 text-wrap lh-sm mb-1">${sub.subSystemName}</div><div class="text-success fw-bold text-wrap lh-sm" style="font-size:0.75rem;"><i class="bi bi-arrow-return-right"></i> ${group.groupName}</div></td>`; } else { groupNameHtml = `<td class="sticky-col-1 d-none"></td>`; }
             var classBg = p.classification === 'A' ? 'bg-danger' : (p.classification === 'B' ? 'bg-warning text-dark' : 'bg-success');
-            html += `<tr data-partname="${p.partName}" data-freq="${freqNum}" data-lastpm="${rawDate || ''}">${groupNameHtml}<td class="sticky-col-2 border-start-0"><div class="fw-bold text-dark text-wrap fs-6 mb-1">${p.partName}</div><div class="text-muted mb-2" style="font-size:0.75rem;">P/N: ${p.partNumber || '-'} | ID: ${p.partId || '-'}</div><div class="d-flex flex-wrap gap-1" style="font-size:0.75rem;"><span class="badge bg-light text-dark border"><i class="bi bi-gear"></i> Std: ${p.pmStandard || '-'}</span><span class="badge ${classBg}">Class ${p.classification || '-'}</span><span class="badge bg-danger text-white"><i class="bi bi-calendar-week"></i> Freq: ${p.pmFrequency}</span></div></td>`;
+            
+            // 🔴 ฝัง Part ID เอาไว้ใน HTML เพื่อให้เวลากดอัปเดต จะได้ส่งไปหาเซิร์ฟเวอร์ด้วย
+            html += `<tr data-partname="${p.partName}" data-partid="${p.partId}" data-freq="${freqNum}" data-lastpm="${rawDate || ''}">${groupNameHtml}<td class="sticky-col-2 border-start-0"><div class="fw-bold text-dark text-wrap fs-6 mb-1">${p.partName}</div><div class="text-muted mb-2" style="font-size:0.75rem;">P/N: ${p.partNumber || '-'} | ID: ${p.partId || '-'}</div><div class="d-flex flex-wrap gap-1" style="font-size:0.75rem;"><span class="badge bg-light text-dark border"><i class="bi bi-gear"></i> Std: ${p.pmStandard || '-'}</span><span class="badge ${classBg}">Class ${p.classification || '-'}</span><span class="badge bg-danger text-white"><i class="bi bi-calendar-week"></i> Freq: ${p.pmFrequency}</span></div></td>`;
             
             for(var w = startW; w <= endW; w++) {
               var recordedType = historyMap[w];
@@ -1471,16 +1481,19 @@
       var sessionToken = JSON.parse(sessionStr).token;
 
       bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide(); bootstrap.Modal.getInstance(document.getElementById('actionModal')).hide();
-      var cellEl = targetActionCell; var w = targetActionWeek; var tr = cellEl.closest('tr'); var partName = tr.getAttribute('data-partname');
+      
+      // 🔴 ดึงค่าชื่อและ ID อะไหล่จาก HTML
+      var cellEl = targetActionCell; var w = targetActionWeek; var tr = cellEl.closest('tr'); 
+      var partName = tr.getAttribute('data-partname');
+      var partId = tr.getAttribute('data-partid');
+
       showLoading('กำลังบันทึกประวัติการทำ PM...');
       
-      apiCall('updatePMWeekAction', { machineName: currentMachinePM, partName: partName, weekNum: w, typeValue: pendingActionType, token: sessionToken })
+      apiCall('updatePMWeekAction', { machineName: currentMachinePM, partName: partName, partId: partId, weekNum: w, typeValue: pendingActionType, token: sessionToken })
          .then(function(res) { 
              hideLoading(); 
              if(res.success) { 
-                 // รีโหลดหน้าเจาะลึกเครื่องจักร
                  drillDownToMachine(currentMachinePM); 
-                 // สั่งให้หน้า Line Overview ต้องโหลดใหม่เมื่อถูกเปิด
                  document.querySelectorAll('.accordion-body').forEach(el => el.removeAttribute('data-loaded'));
              } else { openAlert("ปฏิเสธการเข้าถึง", res.message); }
          }).catch(function(e) { hideLoading(); openAlert("Error", "บันทึกไม่ได้: " + e.message); });
@@ -1488,7 +1501,6 @@
 
     function exportTableToCSV(filename) {
         var csv = [];
-        // ค้นหาตารางที่กำลังแสดงผลอยู่
         var visibleTable = document.querySelector(".modal.show .table-pm-container table");
         if (!visibleTable) { openAlert("แจ้งเตือน", "ไม่มีข้อมูลสำหรับ Export"); return; }
         
@@ -1588,8 +1600,12 @@
     }
 
     async function handleFormSubmit() {
+      // 🔴 ป้องกันการกด Submit รัวๆ
+      var submitBtn = document.getElementById('btnSubmit');
+      if(submitBtn) submitBtn.disabled = true;
+
       var sessionStr = localStorage.getItem('cmms_user_session');
-      if (!sessionStr) { openAlert("Error", "ไม่พบเซสชั่น กรุณาล็อกอินใหม่"); return; }
+      if (!sessionStr) { openAlert("Error", "ไม่พบเซสชั่น กรุณาล็อกอินใหม่"); if(submitBtn) submitBtn.disabled = false; return; }
       var sessionToken = JSON.parse(sessionStr).token;
       
       var lName = document.getElementById('lineNameSelect').value;
@@ -1600,7 +1616,7 @@
           let isDup = globalMachinesData.some(m => m.machineName.toLowerCase() === mName.toLowerCase());
           if (isDup) {
               openAlert("ข้อมูลซ้ำซ้อน", "ชื่อเครื่องจักร <b>" + mName + "</b> มีในระบบแล้ว<br>หากต้องการแก้ไข กรุณาใช้การเลือกชื่อเครื่องจาก Dropdown แทนการสร้างใหม่ครับ");
-              return;
+              if(submitBtn) submitBtn.disabled = false; return;
           }
       }
 
@@ -1611,7 +1627,7 @@
           if (val !== "") {
               if (idList.includes(val)) {
                   openAlert("ข้อมูลซ้ำซ้อน", "พบรหัสชั้นวาง (ID) <b>" + val + "</b> ถูกกรอกซ้ำกันในหลายชิ้นส่วน กรุณาตรวจสอบความถูกต้องก่อนบันทึกครับ");
-                  return;
+                  if(submitBtn) submitBtn.disabled = false; return;
               }
               idList.push(val);
           }
@@ -1689,6 +1705,7 @@
               openAlert("บันทึกสำเร็จ", "<i class='bi bi-check-circle-fill text-success fs-1 d-block mb-3 text-center'></i><div class='text-center'>" + res.messageTh + "</div>");
           } else { openAlert("เกิดข้อผิดพลาด", res.messageTh); } 
       } catch(err) { hideLoading(); openAlert("ระบบขัดข้อง", err.message); }
+      finally { if(submitBtn) submitBtn.disabled = false; }
     }
 
     function checkAndLoadExistingMachine(mName) {
@@ -1745,10 +1762,12 @@
                 if(currentUserRole === '3' || currentUserRole === '4') {
                     document.getElementById('btnHistoryLog').classList.remove('d-none');
                     document.getElementById('btnManageUsers').classList.remove('d-none'); 
+                    document.getElementById('btnArchiveYearly').classList.remove('d-none');
                     switchView('dashboard');
                 } else {
                     document.getElementById('btnHistoryLog').classList.add('d-none');
                     document.getElementById('btnManageUsers').classList.add('d-none'); 
+                    document.getElementById('btnArchiveYearly').classList.add('d-none');
                     switchView('setup');
                 }
                 if (typeof loadInitialData === "function") loadInitialData();
