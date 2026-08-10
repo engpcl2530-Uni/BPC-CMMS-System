@@ -1051,7 +1051,6 @@
         .catch(function(e) { hideLoading(); openAlert("Error", e.message); });
     }
 
-    // 🔴 กดปุ่ม Archive (จัดเก็บรายปี)
     function triggerYearlyArchive() {
         openConfirm("ยืนยันการจัดเก็บประวัติ", "ระบบจะทำการคัดลอกประวัติการทำ PM/BD ทั้งหมดของปีนี้ไปเก็บในแฟ้ม Archive <br>และ<b>จะล้างเฉพาะเครื่องหมาย PM/BD</b> ออกจากตารางเพื่อเตรียมรับปีใหม่ <br><span class='text-success'>(แผนการล่วงหน้าที่จองไว้จะไม่ถูกลบ)</span><br><br><b class='text-danger'>ดำเนินการต่อหรือไม่?</b>", function() {
             var sessionStr = localStorage.getItem('cmms_user_session');
@@ -1180,7 +1179,16 @@
             tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>ไม่มีประวัติแจ้งซ่อม (Breakdown) ในระบบ</td></tr>";
         } else {
             window.currentMachineBDHistory.forEach(function(job) {
-                var stat = job.result === 'F' ? '<span class="badge bg-success">Finished</span>' : '<span class="badge bg-warning text-dark">Unfinished</span>';
+                // 🔴 แก้ไข: เช็กสถานะให้ครอบคลุมทั้งตัวย่อและคำเต็ม
+                var resStr = String(job.result || "").toLowerCase();
+                var stat = '<span class="badge bg-danger">Unfinished</span>'; 
+                
+                if (resStr === 'f' || resStr.includes('finished') || resStr.includes('เสร็จสมบูรณ์')) {
+                    stat = '<span class="badge bg-success">Finished</span>';
+                } else if (resStr === 'o' || resStr.includes('ongoing') || resStr.includes('กำลังดำเนินการ')) {
+                    stat = '<span class="badge bg-warning text-dark">Ongoing</span>';
+                }
+
                 tbody.innerHTML += `<tr>
                     <td class="fw-bold text-secondary">#${job.num}</td>
                     <td>${job.date}</td>
@@ -1438,7 +1446,6 @@
               groupNameHtml = `<td class="sticky-col-1 bg-light align-middle border-end-0" rowspan="${group.parts.length}"><div class="fw-bold text-dark fs-6 text-wrap lh-sm mb-1">${sub.subSystemName}</div><div class="text-success fw-bold text-wrap lh-sm" style="font-size:0.75rem;"><i class="bi bi-arrow-return-right"></i> ${group.groupName}</div></td>`; } else { groupNameHtml = `<td class="sticky-col-1 d-none"></td>`; }
             var classBg = p.classification === 'A' ? 'bg-danger' : (p.classification === 'B' ? 'bg-warning text-dark' : 'bg-success');
             
-            // 🔴 ฝัง Part ID เอาไว้ใน HTML เพื่อให้เวลากดอัปเดต จะได้ส่งไปหาเซิร์ฟเวอร์ด้วย
             html += `<tr data-partname="${p.partName}" data-partid="${p.partId}" data-freq="${freqNum}" data-lastpm="${rawDate || ''}">${groupNameHtml}<td class="sticky-col-2 border-start-0"><div class="fw-bold text-dark text-wrap fs-6 mb-1">${p.partName}</div><div class="text-muted mb-2" style="font-size:0.75rem;">P/N: ${p.partNumber || '-'} | ID: ${p.partId || '-'}</div><div class="d-flex flex-wrap gap-1" style="font-size:0.75rem;"><span class="badge bg-light text-dark border"><i class="bi bi-gear"></i> Std: ${p.pmStandard || '-'}</span><span class="badge ${classBg}">Class ${p.classification || '-'}</span><span class="badge bg-danger text-white"><i class="bi bi-calendar-week"></i> Freq: ${p.pmFrequency}</span></div></td>`;
             
             for(var w = startW; w <= endW; w++) {
@@ -1482,7 +1489,6 @@
 
       bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide(); bootstrap.Modal.getInstance(document.getElementById('actionModal')).hide();
       
-      // 🔴 ดึงค่าชื่อและ ID อะไหล่จาก HTML
       var cellEl = targetActionCell; var w = targetActionWeek; var tr = cellEl.closest('tr'); 
       var partName = tr.getAttribute('data-partname');
       var partId = tr.getAttribute('data-partid');
@@ -1600,7 +1606,6 @@
     }
 
     async function handleFormSubmit() {
-      // 🔴 ป้องกันการกด Submit รัวๆ
       var submitBtn = document.getElementById('btnSubmit');
       if(submitBtn) submitBtn.disabled = true;
 
